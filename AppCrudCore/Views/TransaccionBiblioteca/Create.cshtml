@@ -1,95 +1,130 @@
-﻿@model AppCrudCore.Models.ViewModels.TransaccionBibliotecaCreateViewModel;
+﻿@model AppCrudCore.Models.ViewModels.TransaccionBiblioteca.TransaccionBibliotecaCreateViewModel;
 
 @{
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<section class="main-container">
+    <div class="glass-card">
+        <header class="form-header">
+            <h1 class="title">Nueva Transacción</h1>
+            <p class="subtitle">Gestión de Biblioteca - Registro de Servicios</p>
+        </header>
 
-<h4>TransaccionBiblioteca</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-                <div asp-validation-summary="All" class="text-danger"></div>
-            <form asp-controller="TransaccionBiblioteca"  asp-action="Create" method="post">
+        <div class="form-wrapper">
+            <div asp-validation-summary="All" class="error-summary"></div>
 
-            <div class="form-group">
-                <label>Cliente</label>
-                <select asp-for="ClienteId" asp-items="ViewBag.Cliente" class="form-control"></select>
-                <span asp-validation-for="ClienteId" class="text-danger"></span>
-            </div>
+            <form asp-controller="TransaccionBiblioteca" asp-action="Create" method="post" class="modern-form">
 
-            <div class="form-group">
-                <label>Empleado</label>
-                <select asp-for="EmpleadoId" asp-items="ViewBag.Empleados" class="form-control"></select>
-                <span asp-validation-for="EmpleadoId" class="text-danger"></span>
-            </div>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label class="field-label">Cliente</label>
+                        <select asp-for="ClienteId" asp-items="ViewBag.Cliente" class="custom-select"></select>
+                        <span asp-validation-for="ClienteId" class="error-text"></span>
+                    </div>
 
-            <div class="form-group">
-                <label>Tipo Servicio</label>
-                <select asp-for="TipoServicio" class="form-control">
-                    <option value="1">Venta</option>
-                    <option value="2">Préstamo</option>
-                </select>
-                <span asp-validation-for="TipoServicio" class="text-danger"></span>
-            </div>
+                    <div class="input-group">
+                        <label class="field-label">Empleado</label>
+                        <select asp-for="EmpleadoId" asp-items="ViewBag.Empleados" class="custom-select"></select>
+                        <span asp-validation-for="EmpleadoId" class="error-text"></span>
+                    </div>
 
-            <div class="form-group">
-                <label>Origen</label>
-                <select asp-for="Origen" class="form-control">
-                    <option value="1">Tienda Física</option>
-                    <option value="2">Web</option>
-                </select>
-                <span asp-validation-for="Origen" class="text-danger"></span>
-            </div>
+                    <div class="input-group">
+                        <label class="field-label">Tipo Servicio</label>
+                        <select asp-for="TipoServicio" class="custom-select">
+                            <option value="1">Venta</option>
+                            <option value="2">Préstamo</option>
+                        </select>
+                    </div>
 
-            <hr />
+                    <div class="input-group">
+                        <label class="field-label">Origen</label>
+                        <select asp-for="Origen" class="custom-select">
+                            <option value="1">Tienda Física</option>
+                            <option value="2">Web</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="field-label">Tipo de Pago</label>
+                        <select asp-for="TipoPago" class="custom-select">
+                            <option value="1">Efectivo</option>
+                            <option value="2">Tarjeta</option>
+                            <option value="3">SINPE</option>
+                            <option value="4">Transferencia</option>
+                        </select>
+                    </div>
+                    <div class="input-group conditional-date" id="grupoFechaDevolucion" style="display:none;">
+                        <label class="field-label">Fecha devolución</label>
+                        <input type="date" class="custom-input" name="FechaDevolucion" id="fechaDevolucion" />
+                    </div>
 
-            <div class="form-group">
-                <label>Buscar Libro</label>
-                <input type="text" id="buscarLibro" class="form-control"
-                       placeholder="Escriba título o ISBN..." autocomplete="off" />
+                </div>
 
-                <select id="resultadoLibros" name="Detalles[0].LibroId"
-                        class="form-control mt-2">
-                </select>
-            </div>
+                <div class="separator"></div>
 
-            <div class="form-group">
-                <label>Cantidad</label>
-                <input name="Detalles[0].Cantidad" class="form-control" type="number" min="1" />
-            </div>
+                <div class="inventory-section">
+                    <div class="input-group full-width">
+                        <label class="field-label">Buscar Libro</label>
+                        <input type="text" id="buscarLibro" class="custom-input search-icon"
+                               placeholder="Escriba título o ISBN..." autocomplete="off" />
 
-            <hr />
+                        <select id="resultadoLibros" name="Detalles[0].LibroId" class="custom-select result-box">
+                        </select>
+                    </div>
 
-            <div class="card p-3 mt-2">
+                    <div class="input-group small">
+                        <label class="field-label">Cantidad</label>
+                        <input name="Detalles[0].Cantidad" class="custom-input" type="number" min="1" value="1" />
+                    </div>
+                </div>
 
-                <div><strong>Precio Unitario:</strong> ₡ <span id="precioUnitario">0.00</span></div>
+                <div class="summary-card">
+                    <div class="summary-item">
+                        <span class="label">Precio Unitario:</span>
+                        <span class="value">₡ <span id="precioUnitario">0.00</span></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Disponible:</span>
+                        <span class="value accent" id="stockDisponible">0</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span class="label">Subtotal:</span>
+                        <span class="value">₡ <span id="subtotal">0.00</span></span>
+                    </div>
+                </div>
 
-                <div><strong>Disponible:</strong> <span id="stockDisponible">0</span></div>
+                 <div class="inventory-section">
+                    <div class="input-group full-width">
+                            <label class="field-label">Monto Pagado</label>
+                            <input asp-for="MontoPagado"
+                                   class="custom-input"
+                                   type="number"
+                                   step="0.01"
+                                   min="0" />
+                        </div>
+                        <div class="input-group small">
+                            <label class="field-label">Referencia de Pago</label>
+                            <input asp-for="ReferenciaPago"
+                                   class="custom-input"
+                                   placeholder="Número de comprobante, SINPE, etc." />
+                        </div>
+                        </div>
+                <div class="input-group">
+                    <label class="field-label">Observaciones</label>
+                    <textarea asp-for="Observaciones"
+                              class="custom-input"
+                              rows="3"
+                              placeholder="Notas adicionales..."></textarea>
+                </div>
 
-                <div><strong>Subtotal:</strong> ₡ <span id="subtotal">0.00</span></div>
-
-            </div>
-
-            <hr />
-
-            <div class="form-group mt-2" id="grupoFechaDevolucion" style="display:none;">
-                <label>Fecha devolución</label>
-                <input type="date" class="form-control" name="FechaDevolucion" id="fechaDevolucion" />
-            </div>
-
-
-
-            <button type="submit" class="btn btn-primary">Crear Transacción</button>
-
-        </form>
+                <div class="actions">
+                    <button type="submit" class="btn-primary-submit">Confirmar Transacción</button>
+                    <a asp-action="Index" class="btn-back">Regresar al Listado</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+</section>
 
 @section Scripts {
 
@@ -97,138 +132,174 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script>
+<script>
 
-        let debounceTimer;
-        let libroSeleccionado = null;
+    const PRECIO_PRESTAMO = 500;
+    let debounceTimer;
+    let libroSeleccionado = null;
 
-        const buscarInput = document.getElementById("buscarLibro");
-        const resultadoSelect = document.getElementById("resultadoLibros");
-        const cantidadInput = document.querySelector("input[name='Detalles[0].Cantidad']");
-        const tipoServicioSelect = document.getElementById("TipoServicio");
+    const buscarInput = document.getElementById("buscarLibro");
+    const resultadoSelect = document.getElementById("resultadoLibros");
+    const cantidadInput = document.querySelector("input[name='Detalles[0].Cantidad']");
+    const tipoServicioSelect = document.getElementById("TipoServicio");
 
-        const precioSpan = document.getElementById("precioUnitario");
-        const stockSpan = document.getElementById("stockDisponible");
-        const subtotalSpan = document.getElementById("subtotal");
+    const precioSpan = document.getElementById("precioUnitario");
+    const stockSpan = document.getElementById("stockDisponible");
+    const subtotalSpan = document.getElementById("subtotal");
+    const grupoFecha = document.getElementById("grupoFechaDevolucion");
+    const btnConfirmar = document.querySelector(".btn-primary-submit");
 
-        const grupoFecha = document.getElementById("grupoFechaDevolucion");
 
+    // 1. BUSCAR LIBROS
+    buscarInput.addEventListener("input", function () {
+        clearTimeout(debounceTimer);
+        const term = this.value;
 
-        // BUSCAR LIBROS
+        debounceTimer = setTimeout(() => {
+            if (term.length < 2) return;
 
-        buscarInput.addEventListener("input", function () {
-
-            clearTimeout(debounceTimer);
-
-            const term = this.value;
-
-            debounceTimer = setTimeout(() => {
-
-                if (term.length < 2) return;
-
-                fetch(`/TransaccionBiblioteca/BuscarLibros?term=${term}`)
-                    .then(r => r.json())
-                    .then(data => {
-
-                        resultadoSelect.innerHTML = "";
-
+            fetch(`/TransaccionBiblioteca/BuscarLibros?term=${term}`)
+                .then(r => r.json())
+                .then(data => {
+                    resultadoSelect.innerHTML = "";
+                    
+                    if(data.length > 0) {
                         data.forEach(libro => {
-
                             const option = document.createElement("option");
-
                             option.value = libro.id;
                             option.text = libro.text;
-
-                            option.dataset.precio = libro.precio;
+                            // Asegúrate que estos nombres coincidan con lo que devuelve tu JSON del Controller
+                            option.dataset.precioVenta = libro.precio;
                             option.dataset.stockVenta = libro.stockVenta;
                             option.dataset.stockPrestamo = libro.stockPrestamo;
-
                             resultadoSelect.appendChild(option);
-
                         });
 
-                    });
+                        // CAMBIO CLAVE: Forzar la selección del primer elemento y actualizar
+                        resultadoSelect.selectedIndex = 0;
+                        actualizarDatosDesdeSeleccion();
+                    }
+                });
+        }, 300);
+    });
 
-            }, 300);
+    // 2. SELECCIONAR LIBRO (Manual)
+    resultadoSelect.addEventListener("change", actualizarDatosDesdeSeleccion);
 
-        });
+    // Función auxiliar para no repetir código
+        function actualizarDatosDesdeSeleccion() {
+             if (resultadoSelect.selectedOptions.length === 0) return;
+             libroSeleccionado = resultadoSelect.selectedOptions[0];
+             actualizarPrecio();
+             actualizarStock();
+             actualizarSubtotal();
+            validarStockDisponible();
+         }
 
-
-        // SELECCIONAR LIBRO
-
-        resultadoSelect.addEventListener("change", function () {
-
-            const option = this.selectedOptions[0];
-
-            libroSeleccionado = option;
-
-            const precio = parseFloat(option.dataset.precio);
-
-            precioSpan.innerText = precio.toFixed(2);
-
-            actualizarStock();
-            actualizarSubtotal();
-
-        });
-
-
-        // CAMBIAR CANTIDAD
-
+    // 3. CAMBIAR CANTIDAD
         cantidadInput.addEventListener("input", function () {
+              actualizarStock();
+              actualizarSubtotal();
+          });
 
-            actualizarSubtotal();
+    // 4. CAMBIAR TIPO SERVICIO
+    tipoServicioSelect.addEventListener("change", function () {
+        const tipo = this.value;
+        // "2" es Préstamo en tu HTML
+        grupoFecha.style.display = (tipo === "2") ? "block" : "none";
+        actualizarPrecio();
+        actualizarStock();
+        actualizarSubtotal();
+    });
 
-        });
-
-
-        // CAMBIAR TIPO SERVICIO
-
-        tipoServicioSelect.addEventListener("change", function () {
-
-            const tipo = this.value;
-
-            if (tipo == "2") // préstamo
-                grupoFecha.style.display = "block";
-            else
-                grupoFecha.style.display = "none";
-
-            actualizarStock();
-
-        });
-
-
-        // FUNCIONES
-
+    // FUNCIONES DE CÁLCULO
         function actualizarStock() {
 
             if (!libroSeleccionado) return;
-
             const tipo = tipoServicioSelect.value;
-
-            let stock = 0;
-
-            if (tipo == "1")
-                stock = libroSeleccionado.dataset.stockVenta;
+            let stockBase = 0;
+            if (tipo === "1")
+                stockBase = parseInt(libroSeleccionado.dataset.stockVenta) || 0;
             else
-                stock = libroSeleccionado.dataset.stockPrestamo;
-
-            stockSpan.innerText = stock;
-
+                stockBase = parseInt(libroSeleccionado.dataset.stockPrestamo) || 0;
+            const cantidad = parseInt(cantidadInput.value) || 0;
+            cantidadInput.max = stockBase;
+            cantidadInput.disabled = stockBase <= 0;
+            const stockVisual = Math.max(stockBase - cantidad, 0);
+            stockSpan.innerText = stockVisual;
+            validarStockDisponible();
         }
 
 
+        function obtenerPrecioActual() {
+            if (!libroSeleccionado) return 0;
+            const tipo = tipoServicioSelect.value;
+            if (tipo === "2") {
+                return PRECIO_PRESTAMO;
+            }
+            return parseFloat(libroSeleccionado.dataset.precioVenta) || 0;
+        }
+
+            function actualizarPrecio() {
+            const precio = obtenerPrecioActual();
+            precioSpan.innerText = precio.toFixed(2);
+        }
+
         function actualizarSubtotal() {
-
+                if (!validarStockDisponible())
+            return;
             if (!libroSeleccionado) return;
-
-            const precio = parseFloat(libroSeleccionado.dataset.precio);
+            const precio = obtenerPrecioActual();
             const cantidad = parseInt(cantidadInput.value) || 0;
-
             const subtotal = precio * cantidad;
-
             subtotalSpan.innerText = subtotal.toFixed(2);
 
         }
 
-    </script>
+        //BLOQUEAR BOTON SINO HAY STOCK
+                function validarStockDisponible() {
+
+            if (!libroSeleccionado) {
+                btnConfirmar.disabled = true;
+                return false;
+            }
+            const tipo = tipoServicioSelect.value;
+            let stockBase = 0;
+            if (tipo === "1")
+                stockBase = parseInt(libroSeleccionado.dataset.stockVenta) || 0;
+            else
+                stockBase = parseInt(libroSeleccionado.dataset.stockPrestamo) || 0;
+            const cantidad = parseInt(cantidadInput.value) || 0;
+
+            // Caso crítico: no hay stock
+            if (stockBase <= 0) {
+                stockSpan.innerText = "0";
+                stockSpan.style.color = "#ff4d4d";
+                btnConfirmar.disabled = true;
+                return false;
+            }
+
+            // Caso cantidad mayor al stock
+            if (cantidad > stockBase) {
+                cantidadInput.value = stockBase;
+                stockSpan.innerText = "0";
+                stockSpan.style.color = "#ff4d4d";
+                btnConfirmar.disabled = true;
+                return false;
+            }
+
+            // Caso válido
+            btnConfirmar.disabled = false;
+            stockSpan.style.color = "";
+            return true;
+        }
+
+        document.querySelector("form").addEventListener("submit", function(e){
+            if (!validarStockDisponible()) {
+                e.preventDefault();
+                alert("No hay stock disponible para este servicio.");
+            }
+        });
+
+</script>
 }

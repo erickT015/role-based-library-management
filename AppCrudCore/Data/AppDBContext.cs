@@ -189,13 +189,48 @@ namespace AppCrudCore.Data
             //==PROPIEDADES DE TABLA TRANSACCION BIBLIOTECA
             modelBuilder.Entity<TransaccionBiblioteca>(tb =>
             {
-                tb.HasKey(col => col.IdTransaccionBiblioteca); //es primary
+                //Primary
+                tb.HasKey(col => col.IdTransaccionBiblioteca);
                 tb.Property(col => col.IdTransaccionBiblioteca)
                 .UseIdentityColumn() //incremental (1,1)
                 .ValueGeneratedOnAdd(); //no envies valor, la db lo gesyiona
 
-                tb.Property(col => col.Total).HasColumnType("decimal(18,2)");
+                //numero de transaccion
+                tb.Property(col => col.NumeroTransaccion)
+                .IsRequired()
+                .HasMaxLength(50);
+                tb.HasIndex(col => col.NumeroTransaccion)
+                .IsUnique();
 
+
+                // Formato correcto para decimales
+                tb.Property(col => col.Total)
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
+
+                tb.Property(col => col.MontoPagado)
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
+
+                // referencia de pago
+                tb.Property(col => col.ReferenciaPago)
+                    .HasMaxLength(100);
+
+
+                // Observaaciones
+                tb.Property(col => col.Observaciones)
+                    .HasMaxLength(500);
+
+
+                // Fechas
+                tb.Property(col => col.FechaCreacion).IsRequired();
+                tb.HasIndex(col => col.FechaCreacion);
+
+                tb.Property(col => col.FechaDevolucion).IsRequired(false);
+
+                tb.Property(col => col.FechaCompletada).IsRequired(false);
+
+                //LLaves foraneas
                 tb.HasOne(col => col.Cliente)//FK
                .WithMany()
                .HasForeignKey(col => col.ClienteId)
@@ -230,7 +265,7 @@ namespace AppCrudCore.Data
                 tb.HasOne(col => col.TransaccionBiblioteca) //fk
               .WithMany( t => t.Detalles)
               .HasForeignKey(col => col.TransaccionBibliotecaId)
-               .OnDelete(DeleteBehavior.Restrict);
+               .OnDelete(DeleteBehavior.Cascade);
 
             });
         }

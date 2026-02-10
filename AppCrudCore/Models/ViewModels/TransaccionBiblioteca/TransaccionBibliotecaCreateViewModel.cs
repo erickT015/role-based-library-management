@@ -1,7 +1,8 @@
 ﻿using AppCrudCore.Models.Enums;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace AppCrudCore.Models.ViewModels
+namespace AppCrudCore.Models.ViewModels.TransaccionBiblioteca
 {
     public class TransaccionBibliotecaCreateViewModel
     {
@@ -15,6 +16,19 @@ namespace AppCrudCore.Models.ViewModels
 
         [Required]
         public OrigenTransaccion Origen { get; set; }
+
+        [Required]
+        public TipoPago TipoPago { get; set; }
+
+        public DateTime? FechaDevolucion { get; set; }
+
+        public string? Observaciones { get; set; }
+
+        public string? ReferenciaPago { get; set; }
+
+        public decimal MontoPagado { get; set; }
+
+        public decimal Total { get; set; }
 
         public List<CreateTransaccionDetalleViewModel> Detalles { get; set; }
             = new List<CreateTransaccionDetalleViewModel>();

@@ -1,7 +1,7 @@
 ﻿using AppCrudCore.Data;
 using AppCrudCore.Models;
 using AppCrudCore.Models.Enums;
-using AppCrudCore.Models.ViewModels;
+using AppCrudCore.Models.ViewModels.TransaccionBiblioteca;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +31,7 @@ namespace AppCrudCore.Controllers
                 .ThenInclude(d => d.Libro);
             return View(await appDBContext.ToListAsync());
         }
+
 
         // GET: TransaccionBiblioteca/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -74,7 +75,7 @@ namespace AppCrudCore.Controllers
                     stockVenta = l.StockVenta,
                     stockPrestamo = l.StockPrestamo,
                     stockTotal = l.StockTotal,
-                    text = $"{l.Titulo} | ISBN: {l.ISBN} | Venta: {l.StockVenta} | Préstamo: {l.StockPrestamo}"
+                    text = $"{l.Titulo} | ISBN: {l.ISBN} | Sale: {l.StockVenta} | Rent: {l.StockPrestamo}"
                 })
                 .ToListAsync();
 
@@ -101,6 +102,22 @@ namespace AppCrudCore.Controllers
         }
 
 
+        //funcion para obtener el numero de transaccion
+        private async Task<string> GenerarNumeroTransaccion()
+        {
+            var fecha = DateTime.Now;
+
+            var ultimoId = await _context.TransaccionBiblioteca
+                .OrderByDescending(t => t.IdTransaccionBiblioteca)
+                .Select(t => t.IdTransaccionBiblioteca)
+                .FirstOrDefaultAsync();
+
+            var siguiente = ultimoId + 1;
+
+            return $"TX-{fecha:yyyyMMdd}-{siguiente:D6}";
+        }
+
+
         //POST:
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -115,12 +132,27 @@ namespace AppCrudCore.Controllers
             {
                 var transaccion = new TransaccionBiblioteca
                 {
+                    NumeroTransaccion = await GenerarNumeroTransaccion(),
+
                     ClienteId = model.ClienteId,
                     EmpleadoId = model.EmpleadoId,
+
                     TipoServicio = model.TipoServicio,
                     Origen = model.Origen,
+
                     Estado = EstadoTransaccion.Completada,
-                    FechaCreacion = DateTime.Now
+
+                    TipoPago = model.TipoPago,
+
+                    FechaCreacion = DateTime.Now,
+
+                    FechaDevolucion = model.TipoServicio == TipoServicio.Prestamo
+         ? model.FechaDevolucion
+         : null,
+
+                    ReferenciaPago = model.ReferenciaPago,
+
+                    Observaciones = model.Observaciones
                 };
 
                 decimal total = 0;
@@ -147,15 +179,18 @@ namespace AppCrudCore.Controllers
                         libro.StockPrestamo -= item.Cantidad;
                     }
 
-                    libro.StockTotal -= item.Cantidad;
+                    decimal precioUnitario =
+        model.TipoServicio == TipoServicio.Prestamo
+        ? 500
+        : libro.PrecioVenta;
 
-                    var subtotal = libro.PrecioVenta * item.Cantidad;
+                    var subtotal = precioUnitario * item.Cantidad;
 
                     var detalle = new TransaccionDetalle
                     {
                         LibroId = libro.IdLibro,
                         Cantidad = item.Cantidad,
-                        PrecioUnitario = libro.PrecioVenta,
+                        PrecioUnitario = precioUnitario,
                         Subtotal = subtotal
                     };
 
@@ -165,8 +200,10 @@ namespace AppCrudCore.Controllers
                 }
 
                 transaccion.Total = total;
+                transaccion.MontoPagado = total;
 
-                 _context.TransaccionBiblioteca.Add(transaccion);
+
+                _context.TransaccionBiblioteca.Add(transaccion);
 
                 await _context.SaveChangesAsync();
 
@@ -183,6 +220,7 @@ namespace AppCrudCore.Controllers
                 return View(model);
             }
         }
+
 
         private bool TransaccionBibliotecaExists(int id)
         {

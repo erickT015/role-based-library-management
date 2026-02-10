@@ -1,6 +1,6 @@
 ﻿using AppCrudCore.Data; //conexion a base de datos
 using AppCrudCore.Models; // modelos
-using AppCrudCore.Models.ViewModels;
+using AppCrudCore.Models.ViewModels.Empleado;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

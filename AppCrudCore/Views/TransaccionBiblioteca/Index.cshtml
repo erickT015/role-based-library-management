@@ -3,83 +3,72 @@
 @{
     ViewData["Title"] = "Index";
 }
+<section class="main-container">
+    <div class="glass-card table-page">
+        <header class="table-header">
+            <div class="header-content">
+                <h1 class="title">Historial de Transacciones</h1>
+                <p class="subtitle">Monitoreo de movimientos de biblioteca</p>
+            </div>
+            <a asp-action="Create" class="btn-create">+ Nueva Transacción</a>
+        </header>
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Cliente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Empleado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TipoServicio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Origen)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Estado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Total)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaCreacion)
-            </th>
-            <th>
-              Detalles
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cliente.Cedula)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Empleado.Cedula)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TipoServicio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Origen)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Estado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Total)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaCreacion)
-            </td>
-                <td>
-                    @foreach (var detalle in item.Detalles)
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Empleado</th>
+                        <th>Servicio</th>
+                        <th>Origen</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                        <th>Detalles</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
                     {
-                        <div>
-                            <strong>@detalle.Libro.Titulo</strong><br />
-                            Cantidad: @detalle.Cantidad <br />
-                        </div>
-
-                        <hr />
+                        <tr>
+                            <td class="user-cell">
+                                <span class="id-badge">ID</span> @Html.DisplayFor(modelItem => item.Cliente.Cedula)
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.Empleado.Cedula)</td>
+                            <td>
+                                <span class="tag-service">@Html.DisplayFor(modelItem => item.TipoServicio)</span>
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.Origen)</td>
+                            <td>
+                                <span class="status-pill @item.Estado.ToString().ToLower()">
+                                    @Html.DisplayFor(modelItem => item.Estado)
+                                </span>
+                            </td>
+                            <td class="price-cell">₡@Html.DisplayFor(modelItem => item.Total)</td>
+                            <td class="date-cell">@item.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <div class="details-container">
+                                    @foreach (var detalle in item.Detalles)
+                                    {
+                                        <div class="detail-item">
+                                            <span class="book-title">@detalle.Libro.Titulo</span>
+                                            <span class="book-qty">Cant: @detalle.Cantidad</span>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                            <td class="actions-cell">
+                                <div class="action-buttons">
+                                    <a asp-action="Edit" asp-route-id="@item.IdTransaccionBiblioteca" class="btn-icon edit" title="Editar">✏️</a>
+                                    <a asp-action="Details" asp-route-id="@item.IdTransaccionBiblioteca" class="btn-icon details" title="Ver">👁️</a>
+                                    <a asp-action="Delete" asp-route-id="@item.IdTransaccionBiblioteca" class="btn-icon delete" title="Borrar">🗑️</a>
+                                </div>
+                            </td>
+                        </tr>
                     }
-                </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdTransaccionBiblioteca">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdTransaccionBiblioteca">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdTransaccionBiblioteca">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

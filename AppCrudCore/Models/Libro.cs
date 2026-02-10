@@ -31,8 +31,6 @@ namespace AppCrudCore.Models
 
         [Required(ErrorMessage = "El precio de venta es obligatorio")]
         [Range(0, (double)decimal.MaxValue, ErrorMessage = "El precio no puede ser negativo")]
-        [DataType(DataType.Currency)] // Indica el tipo de dato
-        [DisplayFormat(DataFormatString = "{0:C2}", ApplyFormatInEditMode = false)] // Formato de moneda con 2 decimales
         public decimal PrecioVenta { get; set; }
 
 

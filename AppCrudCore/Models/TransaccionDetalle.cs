@@ -9,12 +9,12 @@ namespace AppCrudCore.Models
 
         [Required]
         public int TransaccionBibliotecaId { get; set; } //FK
-        public TransaccionBiblioteca TransaccionBiblioteca { get; set; }
+        public TransaccionBiblioteca? TransaccionBiblioteca { get; set; }
 
 
         [Required]
         public int LibroId { get; set; } //FK
-        public Libro Libro { get; set; }
+        public Libro? Libro { get; set; }
 
 
         [Required]

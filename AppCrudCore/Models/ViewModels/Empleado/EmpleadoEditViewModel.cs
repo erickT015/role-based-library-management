@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace AppCrudCore.Models.ViewModels
+namespace AppCrudCore.Models.ViewModels.Empleado
 {
     public class EmpleadoEditViewModel
     {
