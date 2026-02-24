@@ -1,84 +1,140 @@
 ﻿@model AppCrudCore.Models.Libro
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles del Libro";
 }
 
-<h1>Details</h1>
+<section class="main-container">
 
-<div>
-    <h4>Libro</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Titulo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Titulo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Autor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Autor)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ISBN)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ISBN)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AnioPublicacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AnioPublicacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Resumen)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Resumen)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PrecioVenta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PrecioVenta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockTotal)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockTotal)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockPrestamo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockPrestamo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockVenta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockVenta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Activo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Activo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Categoria)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Categoria.Nombre)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdLibro">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="glass-card">
+
+        <!-- HEADER -->
+        <div class="form-header">
+            <h1 class="title">Detalles del Libro</h1>
+            <p class="subtitle">
+                Información completa del libro seleccionado
+            </p>
+        </div>
+
+        <!-- INFORMACIÓN GENERAL -->
+        <div class="form-grid">
+
+            <div class="detail-block">
+                <span class="field-label">Título</span>
+                <div class="detail-value">
+                    @Model.Titulo
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Autor</span>
+                <div class="detail-value">
+                    @Model.Autor
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">ISBN</span>
+                <div class="detail-value">
+                    @Model.ISBN
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Año Publicación</span>
+                <div class="detail-value">
+                    @Model.AnioPublicacion
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Categoría</span>
+                <div class="detail-value">
+                    @Model.Categoria?.Nombre
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Precio Venta</span>
+                <div class="detail-value price-cell">
+                    ₡ @Model.PrecioVenta
+                </div>
+            </div>
+
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- RESUMEN -->
+        <div class="detail-block">
+            <span class="field-label">Resumen</span>
+            <div class="detail-value italic">
+                @Model.Resumen
+            </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- INVENTARIO -->
+        <div class="summary-card">
+
+            <div class="summary-item">
+                <span class="label">Stock Total</span>
+                <span class="value">
+                    @Model.StockTotal
+                </span>
+            </div>
+
+            <div class="summary-item">
+                <span class="label">Préstamo</span>
+                <span class="value">
+                    @Model.StockPrestamo
+                </span>
+            </div>
+
+            <div class="summary-item total">
+                <span class="label">Venta</span>
+                <span class="value">
+                    @Model.StockVenta
+                </span>
+            </div>
+
+        </div>
+
+        <!-- ESTADO -->
+        <div class="detail-block">
+            <span class="field-label">Estado</span>
+
+            @if (Model.Activo)
+            {
+                <span class="status-pill activo">
+                    Activo
+                </span>
+            }
+            else
+            {
+                <span class="status-pill pendiente">
+                    Inactivo
+                </span>
+            }
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions">
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.IdLibro"
+               class="btn-custom btnEdit">
+                ✏️ Editar
+            </a>
+
+            <a asp-action="Index"
+               class="btn-custom btnDetails">
+                ← Volver
+            </a>
+
+        </div>
+
+    </div>
+
+</section>

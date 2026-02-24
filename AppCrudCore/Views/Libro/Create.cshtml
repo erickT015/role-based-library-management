@@ -1,7 +1,7 @@
 ﻿@model AppCrudCore.Models.Libro
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Crear Libro";
 }
 
 <section class="main-container">
@@ -12,21 +12,29 @@
         </header>
 
         <div class="form-wrapper">
-            <form asp-action="Create">
+            <form asp-action="Create" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-grid">
                     <div class="input-group">
-                        <label  class="field-label">Título</label>
+                        <label class="field-label">Imagen</label>
+
+                        <input type="file"
+                               name="imagenArchivo"
+                               accept="image/*"
+                               class="custom-input" />
+                    </div>
+                    <div class="input-group">
+                        <label class="field-label">Título</label>
                         <input asp-for="Titulo" class="custom-input" />
                         <span asp-validation-for="Titulo" class="text-danger"></span>
                     </div>
                     <div class="input-group">
-                        <label  class="field-label">Autor</label>
+                        <label class="field-label">Autor</label>
                         <input asp-for="Autor" class="custom-input" />
                         <span asp-validation-for="Autor" class="text-danger"></span>
                     </div>
                     <div class="input-group">
-                        <label  class="field-label">ISBN</label>
+                        <label class="field-label">ISBN</label>
                         <input asp-for="ISBN" class="custom-input" />
                         <span asp-validation-for="ISBN" class="text-danger"></span>
                     </div>
@@ -36,32 +44,32 @@
                         <span asp-validation-for="AnioPublicacion" class="text-danger"></span>
                     </div>
                     <div class="input-group">
-                        <label  class="field-label">Resumen</label>
+                        <label class="field-label">Resumen</label>
                         <input asp-for="Resumen" class="custom-input" />
                         <span asp-validation-for="Resumen" class="text-danger"></span>
                     </div>
                     <div class="input-group">
-                        <label  class="field-label">Precio Venta</label>
+                        <label class="field-label">Precio Venta</label>
                         <input asp-for="PrecioVenta" class="custom-input" />
                         <span asp-validation-for="PrecioVenta" class="text-danger"></span>
                     </div>
                     <div class="input-group">
-                        <label  class="field-label">Cantidad Total</label>
+                        <label class="field-label">Cantidad Total</label>
                         <input asp-for="StockTotal" class="custom-input" />
                         <span asp-validation-for="StockTotal" class="text-danger"></span>
                     </div>
                     <div class="input-group">
-                        <label  class="field-label">Cantidad Préstamo</label>
+                        <label class="field-label">Cantidad Préstamo</label>
                         <input asp-for="StockPrestamo" class="custom-input" />
                         <span asp-validation-for="StockPrestamo" class="text-danger"></span>
                     </div>
                     <div class="input-group">
-                        <label  class="field-label">Cantidad Venta</label>
+                        <label class="field-label">Cantidad Venta</label>
                         <input asp-for="StockVenta" class="custom-input" />
                         <span asp-validation-for="StockVenta" class="text-danger"></span>
                     </div>
                     <div class="input-group">
-                        <label  class="field-label">Categoría</label>
+                        <label class="field-label">Categoría</label>
                         <select asp-for="CategoriaId" class="custom-select" asp-items="ViewBag.CategoriaId"></select>
                     </div>
                     <div class="input-group">
@@ -70,7 +78,7 @@
                         </label>
                     </div>
                 </div>
-                        <hr>
+                <hr>
                 <div class="action">
                     <input type="submit" value="Create" class="btn btn-primary" />
                 </div>

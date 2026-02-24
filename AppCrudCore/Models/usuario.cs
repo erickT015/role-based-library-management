@@ -1,8 +1,9 @@
 ﻿﻿using System.ComponentModel.DataAnnotations;
+using AppCrudCore.Models.Interfaces;
 
 namespace AppCrudCore.Models
 {
-    public class Usuario
+    public class Usuario : IActivable
     {
         public int IdUsuario { get; set; }
 

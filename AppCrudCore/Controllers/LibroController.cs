@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AppCrudCore.Data;
+using AppCrudCore.Models;
+using AppCrudCore.Models.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using AppCrudCore.Data;
-using AppCrudCore.Models;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AppCrudCore.Controllers
 {
@@ -17,19 +18,42 @@ namespace AppCrudCore.Controllers
     {
         private readonly AppDBContext _context;
 
-        public LibroController(AppDBContext context)
+        public LibroController(AppDBContext context, ILibroImageService imageService)
         {
             _context = context;
+            _imageService = imageService;
         }
 
-        // GET: Libro
-        public async Task<IActionResult> Index()
+        private readonly ILibroImageService _imageService;
+
+
+        [Authorize(Policy = "AdminOrEmpleado")]
+        public async Task<IActionResult> Index(int? categoriaId, int? anioPublicacion, bool? activo)
         {
-            var appDBContext = _context.Libro.Include(l => l.Categoria);
-            return View(await appDBContext.ToListAsync());
+            var query = _context.Libro
+                .Include(l => l.Categoria)
+                .AsQueryable();
+
+            // Filtros existentes...
+            if (categoriaId.HasValue) query = query.Where(l => l.CategoriaId == categoriaId);
+            if (anioPublicacion.HasValue) query = query.Where(l => l.AnioPublicacion == anioPublicacion);
+            if (activo.HasValue) query = query.Where(l => l.Activo == activo);
+
+            // ordenamiento
+            query = query.OrderBy(l => l.Titulo);
+
+            var libros = await query.ToListAsync();
+
+            ViewBag.Categorias = new SelectList(await _context.Categoria.ToListAsync(), "IdCategoria", "Nombre", categoriaId);
+            ViewBag.AnioPublicacion = anioPublicacion;
+            ViewBag.Activo = activo;
+
+            return View(libros);
         }
+
 
         // GET: Libro/Details/5
+        [Authorize(Policy = "AdminOrEmpleado")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -49,6 +73,7 @@ namespace AppCrudCore.Controllers
         }
 
         // GET: Libro/Create
+        [Authorize(Policy = "AdminOrEmpleado")]
         public IActionResult Create()
         {
             ViewData["CategoriaId"] = new SelectList(_context.Categoria, "IdCategoria", "Nombre");
@@ -56,14 +81,18 @@ namespace AppCrudCore.Controllers
         }
 
         // POST: Libro/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdLibro,Titulo,Autor,ISBN,AnioPublicacion,Resumen,PrecioVenta,StockTotal,StockPrestamo,StockVenta,Activo,CategoriaId")] Libro libro)
+        [Authorize(Policy = "AdminOrEmpleado")]
+        public async Task<IActionResult> Create([Bind("IdLibro,Titulo,Autor,ISBN,AnioPublicacion,Resumen,PrecioVenta,StockTotal,StockPrestamo,StockVenta,Activo,CategoriaId")] Libro libro, IFormFile? imagenArchivo)
         {
             if (ModelState.IsValid)
             {
+                // guardar imagen usando service
+                libro.ImagenUrl =
+                    await _imageService
+                        .GuardarImagenAsync(imagenArchivo);
+
                 _context.Add(libro);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -73,6 +102,7 @@ namespace AppCrudCore.Controllers
         }
 
         // GET: Libro/Edit/5
+        [Authorize(Policy = "AdminOrEmpleado")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -90,11 +120,10 @@ namespace AppCrudCore.Controllers
         }
 
         // POST: Libro/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdLibro,Titulo,Autor,ISBN,AnioPublicacion,Resumen,PrecioVenta,StockTotal,StockPrestamo,StockVenta,Activo,CategoriaId")] Libro libro)
+        [Authorize(Policy = "AdminOrEmpleado")]
+        public async Task<IActionResult> Edit(int id, [Bind("IdLibro,Titulo,Autor,ISBN,AnioPublicacion,Resumen,PrecioVenta,StockTotal,StockPrestamo,StockVenta,Activo,CategoriaId")] Libro libro, IFormFile? imagenArchivo)
         {
             if (id != libro.IdLibro)
             {
@@ -105,6 +134,18 @@ namespace AppCrudCore.Controllers
             {
                 try
                 {
+
+                    // REEMPLAZAR IMAGEN
+                    if (imagenArchivo != null)
+                    {
+                        await _imageService
+                            .EliminarImagenAsync(libro.ImagenUrl);
+
+                        libro.ImagenUrl =
+                            await _imageService
+                                .GuardarImagenAsync(imagenArchivo);
+                    }
+
                     _context.Update(libro);
                     await _context.SaveChangesAsync();
                 }
@@ -126,6 +167,7 @@ namespace AppCrudCore.Controllers
         }
 
         // GET: Libro/Delete/5
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -147,12 +189,13 @@ namespace AppCrudCore.Controllers
         // POST: Libro/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var libro = await _context.Libro.FindAsync(id);
             if (libro != null)
             {
-                _context.Libro.Remove(libro);
+                libro.Activo = false;
             }
 
             await _context.SaveChangesAsync();

@@ -11,21 +11,21 @@ namespace AppCrudCore.Models.ViewModels.TransaccionBiblioteca
 
         //public int? EmpleadoId { get; set; } TATBLA VIEJA FK
 
-        [Required]
+        [Required(ErrorMessage = "El monto pagado es obligatorio")]
         public int ClienteUsuarioId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El monto pagado es obligatorio")]
         public int EmpleadoUsuarioId { get; set; }
 
 
 
-        [Required]
+        [Required(ErrorMessage = "Seleccionar el tipo de servicio es obligatorio")]
         public TipoServicio TipoServicio { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Debe seleccionar el origen de la transacción")]
         public OrigenTransaccion Origen { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Debe seleccionar el tipo de servicio para la transacción")]
         public TipoPago TipoPago { get; set; }
 
         public DateTime? FechaDevolucion { get; set; }
@@ -36,8 +36,10 @@ namespace AppCrudCore.Models.ViewModels.TransaccionBiblioteca
 
         public string? ReferenciaPago { get; set; }
 
+        [Required(ErrorMessage = "El monto pagado es obligatorio")]
         public decimal MontoPagado { get; set; }
 
+        [Required(ErrorMessage = "El total es obligatorio")]
         public decimal Total { get; set; }
 
         public List<CreateTransaccionDetalleViewModel> Detalles { get; set; }

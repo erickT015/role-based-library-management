@@ -2,7 +2,7 @@
 {
     public enum EstadoTransaccion
     {
-        Bodega = 1,
+        Devuelto = 1,
         Prestado = 2,
         Vendido = 3,
         Cancelado = 4

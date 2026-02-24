@@ -90,6 +90,7 @@ namespace AppCrudCore.Controllers
 
         // POST: ForgotPassword
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult ForgotPassword(ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid)

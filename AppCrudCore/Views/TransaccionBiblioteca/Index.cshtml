@@ -1,22 +1,29 @@
 ﻿@model IEnumerable<AppCrudCore.Models.TransaccionBiblioteca>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Operaciones";
 }
+
 <section class="main-container">
+
     <div class="glass-card table-page">
         <header class="table-header">
-            <div class="header-content">
+            <div>
                 <h1 class="title">Historial de Transacciones</h1>
                 <p class="subtitle">Monitoreo de movimientos de biblioteca</p>
             </div>
-            <a asp-action="Create" class="btn-create">+ Nueva Transacción</a>
-        </header>
 
+            <a asp-action="Create" class="btn-create">
+                + Nueva Transacción
+            </a>
+        </header>
         <div class="table-responsive">
+
             <table class="modern-table">
+
                 <thead>
                     <tr>
+                        <th style="width:40px;"></th>
                         <th>Cliente</th>
                         <th>Empleado</th>
                         <th>Servicio</th>
@@ -24,53 +31,183 @@
                         <th>Estado</th>
                         <th>Total</th>
                         <th>Fecha</th>
-                        <th>Fecha Devolución</th>
-                        <th>Detalles</th>
-                        <th class="text-center">Acciones</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
+
                     @foreach (var item in Model)
                     {
-                        <tr>
-                            <td class="user-cell">
-                                <span class="id-badge">ID</span> @Html.DisplayFor(modelItem => item.ClienteUsuario.Cedula)
-                            </td>
-                            <td>@Html.DisplayFor(modelItem => item.EmpleadoUsuario.Cedula)</td>
+                        var rowId = $"detail_{item.IdTransaccionBiblioteca}";
+                        <tr class="main-row">
+
                             <td>
-                                <span class="tag-service">@Html.DisplayFor(modelItem => item.TipoServicio)</span>
-                            </td>
-                            <td>@Html.DisplayFor(modelItem => item.Origen)</td>
-                            <td>
-                                <span class="status-pill @item.Estado.ToString().ToLower()">
-                                    @Html.DisplayFor(modelItem => item.Estado)
+                                <span class="toggle-arrow"
+                                      onclick="toggleRow('@rowId',this)">
+                                    ▶
                                 </span>
                             </td>
-                            <td class="price-cell">₡@Html.DisplayFor(modelItem => item.Total)</td>
-                            <td class="date-cell">@item.FechaCreacion.ToString("dd/MM/yyyy")</td>
-                            <td class="date-cell">@item.FechaDevolucion</td>
+
+                            <td>@item.ClienteUsuario.Cedula</td>
+
+                            <td>@item.EmpleadoUsuario.Cedula</td>
+
+                            <td>@item.TipoServicio</td>
+
+                            <td>@item.Origen</td>
+
                             <td>
-                                <div class="details-container">
-                                    @foreach (var detalle in item.Detalles)
-                                    {
-                                        <div class="detail-item">
-                                            <span class="book-title">@detalle.Libro.Titulo</span>
-                                            <span class="book-qty">Cant: @detalle.Cantidad</span>
-                                        </div>
-                                    }
-                                </div>
+                                <span class="status-pill @item.Estado.ToString().ToLower()">
+                                    @item.Estado
+                                </span>
                             </td>
-                            <td class="actions-cell">
+
+                            <td class="price-cell">
+                                ₡@item.Total
+                            </td>
+
+                            <td>
+                                @item.FechaCreacion.ToString("dd/MM/yyyy")
+                            </td>
+
+                            <td>
                                 <div class="action-buttons">
-                                    <a asp-action="Edit" asp-route-id="@item.IdTransaccionBiblioteca" class="btn-icon edit" title="Editar">✏️</a>
-                                    <a asp-action="Details" asp-route-id="@item.IdTransaccionBiblioteca" class="btn-icon details" title="Ver">👁️</a>
-                                    <a asp-action="Delete" asp-route-id="@item.IdTransaccionBiblioteca" class="btn-icon delete" title="Borrar">🗑️</a>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.IdTransaccionBiblioteca"
+                                       class="btn-custom btnEdit">
+                                        Editar
+                                    </a>
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.IdTransaccionBiblioteca"
+                                       class="btn-custom btnDetails">
+                                        Ver
+                                    </a>
+
                                 </div>
                             </td>
+
+                        </tr>
+
+                        <tr id="@rowId" class="expand-row">
+
+                            <td colspan="9">
+
+                                <div class="expand-card">
+                                    <table class="modern-table">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Libro</th>
+                                                <th>Cantidad</th>
+                                                <th>Precio</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            @foreach (var d in item.Detalles)
+                                            {
+                                                <tr>
+                                                    <td class="book-title">
+                                                        @d.Libro.Titulo
+                                                    </td>
+
+                                                    <td>@d.Cantidad</td>
+
+                                                    <td class="price-cell">
+                                                        ₡@d.PrecioUnitario
+                                                    </td>
+
+                                                    <td class="price-cell">
+                                                        ₡@(d.Cantidad* d.PrecioUnitario)
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+                                </div>
+
+                            </td>
+
                         </tr>
                     }
+
                 </tbody>
+
             </table>
+
         </div>
+
     </div>
+
 </section>
+<style>
+    .main-row {
+        transition: all .25s ease;
+    }
+
+        .main-row:hover {
+            background: rgba(255,255,255,.06);
+        }
+
+    .toggle-arrow {
+        cursor: pointer;
+        transition: .3s;
+        color: #94a3b8;
+    }
+
+        .toggle-arrow.open {
+            transform: rotate(90deg);
+            color: #818cf8;
+        }
+
+    .expand-row {
+        display: none;
+    }
+
+    .expand-card {
+        background: rgba(15,23,42,.7);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 16px;
+        padding: 25px;
+        animation: fadeIn .25s ease;
+    }
+</style>
+
+@section Scripts {
+    <script>
+
+        function toggleRow(id, arrow)
+        {
+            document.querySelectorAll(".expand-row")
+                .forEach(r=>{
+                    if(r.id !== id)
+                        r.style.display="none";
+                });
+
+            document.querySelectorAll(".toggle-arrow")
+                .forEach(a=>{
+                    if(a!==arrow)
+                        a.classList.remove("open");
+                });
+
+            const row = document.getElementById(id);
+
+            if(row.style.display==="table-row"){
+                row.style.display="none";
+                arrow.classList.remove("open");
+            }
+            else{
+                row.style.display="table-row";
+                arrow.classList.add("open");
+            }
+        }
+
+    </script>
+}

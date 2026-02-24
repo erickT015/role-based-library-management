@@ -1,5 +1,6 @@
 ﻿using AppCrudCore.Data;
 using AppCrudCore.Models;
+using AppCrudCore.Models.Enums;
 using AppCrudCore.Models.ViewModels.Usuario;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace AppCrudCore.Controllers
 {
-    //[Authorize]
-    public class UsuarioController : Controller
+    [Authorize]
+    public class UsuarioController : BaseController
     {
         private readonly AppDBContext _context;
 
@@ -22,100 +24,175 @@ namespace AppCrudCore.Controllers
             _context = context;
         }
 
-        private void CargarRoles()//METODO PRIVADO PARA CARGAR ROLES
+        private async Task CargarRolesPorUsuario()
         {
-            ViewBag.RolId = _context.Rol
-        .Where(r => r.Activo)
-        .Select(r => new SelectListItem
-        {
-            Value = r.IdRol.ToString(),
-            Text = r.Nombre
-        })
-        .ToList();
+            IQueryable<Rol> query = _context.Rol
+                .Where(r => r.Activo);
+
+
+            if (User.IsInRole("Empleado"))            // EMPLEADO → SOLO CLIENTE
+            {
+                query = query.Where(r => r.Nombre == "Cliente");
+            }
+
+            if (User.IsInRole("Cliente"))            // CLIENTE → NO CAMBIA ROLES
+            {
+                ViewBag.RolId = new SelectList(Enumerable.Empty<SelectListItem>());
+                ViewBag.BloquearRol = true;
+                return;
+            }
+
+            var roles = await query
+                .Select(r => new SelectListItem
+                {
+                    Value = r.IdRol.ToString(),
+                    Text = r.Nombre
+                })
+                .ToListAsync();
+
+            ViewBag.RolId = roles;
         }
 
         // GET: Usuario
-        public async Task<IActionResult> Index()
+        [Authorize(Policy = "AdminOrEmpleado")]
+        public async Task<IActionResult> Index(int? rolId, bool? activo)
         {
-            var usuario =await  _context.Usuario
-                .Include(u => u.Rol) //conectar con tabla rol
-                .AsNoTracking()     //solo lectura
-                .Where(u => u.Activo) // solo activos
-                .ToListAsync();     //enlistar items
+            var query = _context.Usuario
+                .Include(u => u.Rol)
+                .AsNoTracking()
+                .AsQueryable();
 
-            return View(usuario);
+            //filtros existentes
+            query = AplicarFiltroActivo(query, activo); // filtro por query desde base controller
+            query = AplicarRestriccionUsuario(query); // Restricción empleado query desde base controller
+            if (rolId.HasValue)  query = query.Where(u => u.RolId == rolId);
+
+            //ordenamiento
+            query = query.OrderBy(u => u.Cedula);
+
+            var usuarios = await query.ToListAsync();
+
+            ViewBag.Roles = new SelectList( await _context.Rol.ToListAsync(), "IdRol", "Nombre", rolId );
+
+            ViewBag.RolId = rolId;
+            ViewBag.Activo = activo ?? true;
+
+            return View(usuarios);
         }
 
         // GET: Usuario/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var usuario = await _context.Usuario
+            var query = _context.Usuario
                 .Include(u => u.Rol)
-                .FirstOrDefaultAsync(m => m.IdUsuario == id);
-            if (usuario == null)
-            {
-                return NotFound();
-            }
+                .AsNoTracking()
+                .AsQueryable();
 
-            return View(usuario);
+            // Restricción empleado query desde base controller
+            query = AplicarRestriccionUsuario(query);
+
+            var usuario = await query.FirstOrDefaultAsync(u => u.IdUsuario == id);
+
+            if (usuario == null)
+                return NotFound();
+
+            // TRANSACCIONES DEL USUARIO
+            var transacciones = await _context.TransaccionBiblioteca
+                .Where(t => t.ClienteUsuarioId == id)
+                .Include(t => t.Detalles)
+                .ToListAsync();
+
+            // VIEWMODEL
+            var vm = new UsuarioDetailsViewModel
+            {
+                IdUsuario = usuario.IdUsuario,
+                NombreCompleto = usuario.NombreCompleto,
+                Correo = usuario.Correo,
+                Cedula = usuario.Cedula,
+                Telefono = usuario.Telefono,
+                Direccion = usuario.Direccion,
+                RolNombre = usuario.Rol?.Nombre,
+                FechaRegistro = usuario.FechaRegistro,
+                UltimoLogin = usuario.UltimoLogin,
+                Activo = usuario.Activo,
+
+                // ===== Estadísticas =====
+                TotalTransacciones = transacciones.Count,
+
+                LibrosPrestados =
+                    transacciones
+                        .SelectMany(t => t.Detalles)
+                        .Sum(d => d.Cantidad),
+
+                TotalGastado =
+                    transacciones.Sum(t => t.Total),
+
+                UltimaActividad =
+                    transacciones
+                        .OrderByDescending(t => t.FechaCreacion)
+                        .Select(t => (DateTime?)t.FechaCreacion)
+                        .FirstOrDefault()
+            };
+
+            return View(vm);
         }
 
         // GET: Usuario/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            CargarRoles();
-            //ViewData["RolId"] = new SelectList(_context.Rol, "IdRol", "Nombre");
+            await CargarRolesPorUsuario();
             return View();
         }
 
         // POST: Usuario/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminOrEmpleado")]
         public async Task<IActionResult> Create(UsuarioCreateViewModel vm)
         {
-            // vm contiene el Password en texto plano, NO el hash
             try
             {
-                CargarRoles();
                 if (!ModelState.IsValid)
                 {
+                    await CargarRolesPorUsuario(); // Recargar los roles para la vista
                     return View(vm);
                 }
 
-                // Crear nueva entidad Usuario
-                var NuevoUsuario = new Usuario
+                // Crear la entidad Usuario
+                var nuevoUsuario = new Usuario
                 {
-                    Correo = vm.Correo,// asigna correo
-                    Cedula = vm.Cedula,// asigna cédula
-                    NombreCompleto = vm.NombreCompleto,// asigna nombre
-                    Telefono = vm.Telefono,// asigna teléfono
-                    Direccion = vm.Direccion,// asigna dirección
-                    RolId = vm.RolId,// asigna rol
-                    Activo = true,// asigna estado activo
-                    FechaRegistro = DateTime.Now,// se asigna en servidor, nunca desde la vista
-                    UltimoLogin = null,// aún no ha iniciado sesión
-                    RequiereCambioPassword = false,// fuerza cambio en primer login
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(vm.Password)// aquí se convierte el password plano a hash seguro
+                    Correo = vm.Correo,
+                    Cedula = vm.Cedula,
+                    NombreCompleto = vm.NombreCompleto,
+                    Telefono = vm.Telefono,
+                    Direccion = vm.Direccion,
+                    RolId = vm.RolId,
+                    Activo = true,
+                    FechaRegistro = DateTime.Now,
+                    UltimoLogin = null,
+                    RequiereCambioPassword = false,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(vm.Password)
                 };
 
-                await _context.Usuario.AddAsync(NuevoUsuario);
+                // Asignarle rol despues de crear objeto
+                if (User.IsInRole("Empleado"))
+                {
+                    nuevoUsuario.RolId = 3; // Cliente en DB
+                }
+
+                // Guardar en DB
+                await _context.Usuario.AddAsync(nuevoUsuario);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(
-                    "",
-                    "Ah ocurrido este error" + ex
-                );
+                await CargarRolesPorUsuario();
+                ModelState.AddModelError("", "Ha ocurrido un error: " + ex.Message);
                 return View(vm);
             }
         }
@@ -127,8 +204,15 @@ namespace AppCrudCore.Controllers
             if (id == null)
                 return NotFound();
 
-            var usuarioDb = await _context.Usuario
-                .FirstOrDefaultAsync(e => e.IdUsuario == id);
+            var query = _context.Usuario
+        .Include(u => u.Rol)
+        .AsQueryable();
+
+            // Restricción empleado query desde base controller
+            query = AplicarRestriccionUsuario(query);
+
+            var usuarioDb = await query
+        .FirstOrDefaultAsync(u => u.IdUsuario == id);
 
             if (usuarioDb == null)
                 return NotFound();
@@ -145,30 +229,31 @@ namespace AppCrudCore.Controllers
                 RolId = usuarioDb.RolId
             };
 
-            CargarRoles();
+            await CargarRolesPorUsuario();
 
             return View(vm);
         }
 
-        // POST: Usuario/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Edit/
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UsuarioEditViewModel vm)
         {
-            //	$2a$11$R6f/LrCY/qUGJQpTSBADpeyIdUiH9eFP0FnCx9cXPAYHVVdgG9Mfq
-            //  $2a$11$qxFeny1Ns8BZRLlX4Ar8IuqbS/XotH1BG6tfWgNzUGHqZ.wKe/pD.
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    CargarRoles();
+                    await CargarRolesPorUsuario();
                     return View(vm);
                 }
 
-                var usuarioDb = await _context.Usuario
-                    .FirstOrDefaultAsync(u => u.IdUsuario == vm.IdUsuario);
+                var query = _context.Usuario.AsQueryable();
+
+                // Restricción empleado query desde base controller
+                query = AplicarRestriccionUsuario(query);
+
+                var usuarioDb = await query
+        .FirstOrDefaultAsync(u => u.IdUsuario == vm.IdUsuario);
 
                 if (usuarioDb == null)
                     return NotFound();
@@ -180,7 +265,10 @@ namespace AppCrudCore.Controllers
                 usuarioDb.Telefono = vm.Telefono;
                 usuarioDb.Direccion = vm.Direccion;
                 usuarioDb.Activo = vm.Activo;
-                usuarioDb.RolId = vm.RolId;
+                if (User.IsInRole("Admin"))
+                {
+                    usuarioDb.RolId = vm.RolId;
+                }
 
                 // actualizar password solo si se ingresó una nueva
                 if (!string.IsNullOrWhiteSpace(vm.NuevaPassword))
@@ -188,14 +276,14 @@ namespace AppCrudCore.Controllers
                     if (vm.NuevaPassword.Length < 8)
                     {
                         ModelState.AddModelError("NuevaPassword", "Debe tener al menos 8 caracteres");
-                        CargarRoles();
+                        await CargarRolesPorUsuario();
                         return View(vm);
                     }
 
                     if (vm.NuevaPassword != vm.ConfirmarPassword)
                     {
                         ModelState.AddModelError("ConfirmarPassword", "Las contraseñas no coinciden");
-                        CargarRoles();
+                        await CargarRolesPorUsuario();
                         return View(vm);
                     }
 
@@ -214,12 +302,13 @@ namespace AppCrudCore.Controllers
                     "",
                     "Ah ocurrido este error" + ex
                 );
-                CargarRoles();
+                await CargarRolesPorUsuario();
                 return View(vm);
             }
         }
 
         // GET: Usuario/Delete/5
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -227,10 +316,18 @@ namespace AppCrudCore.Controllers
 
             var usuarioDb = await _context.Usuario
                 .Include(u => u.Rol)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.IdUsuario == id);
 
             if (usuarioDb == null)
                 return NotFound();
+
+            var adminId = int.Parse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            // evitar auto eliminación
+            if (usuarioDb.IdUsuario == adminId)
+                return BadRequest();
 
             var vm = new UsuarioDeleteViewModel
             {
@@ -250,16 +347,26 @@ namespace AppCrudCore.Controllers
         // POST: Usuario/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var usuario = await _context.Usuario.FindAsync(id);
+            var usuarioDb = await _context.Usuario
+                .FirstOrDefaultAsync(u => u.IdUsuario == id);
 
-            if (usuario != null)
-            {
-                usuario.Activo = false;
+            if (usuarioDb == null)
+                return NotFound();
 
-                await _context.SaveChangesAsync();
-            }
+            var adminId = int.Parse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            // evitar auto eliminación
+            if (usuarioDb.IdUsuario == adminId)
+                return BadRequest();
+
+            // SOFT DELETE
+            usuarioDb.Activo = false;
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }

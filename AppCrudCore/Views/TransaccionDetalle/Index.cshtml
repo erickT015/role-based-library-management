@@ -1,71 +1,158 @@
-﻿@model IEnumerable<AppCrudCore.Models.TransaccionDetalle>
+﻿@model IEnumerable<AppCrudCore.Models.TransaccionBiblioteca>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Transacciones";
 }
 
 <section class="main-container">
+
     <div class="glass-card table-page">
+
         <header class="table-header">
-            <div class="header-content">
+            <div>
                 <h1 class="title">Detalles Transacción</h1>
-                <p class="subtitle">Visualice los detalles de transacciones</p>
+                <p class="subtitle">
+                    Visualice los movimientos realizados
+                </p>
             </div>
-            <a asp-action="Create" class="btn-create"> agregar Libro</a>
         </header>
 
         <div class="table-responsive">
+
             <table class="modern-table">
+
                 <thead>
                     <tr>
-                        <th>
-                            @Html.DisplayNameFor(model => model.TransaccionBiblioteca)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Libro)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Cantidad)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.PrecioUnitario)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Subtotal)
-                        </th>
+                        <th></th>
+                        <th>Transacción</th>
+                        <th>Servicio</th>
+                        <th>Atendió</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
                         <th></th>
                     </tr>
                 </thead>
+
                 <tbody>
+
                     @foreach (var item in Model)
                     {
+                        var collapseId = $"detalle-{item.IdTransaccionBiblioteca}";
+
                         <tr>
+
+                            <td class="expand-toggle"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#@collapseId">
+
+                                <span class="arrow">▶</span>
+
+                            </td>
+
                             <td>
-                                @Html.DisplayFor(modelItem => item.TransaccionBiblioteca.IdTransaccionBiblioteca)
+                                #@item.IdTransaccionBiblioteca
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Libro.Autor)
+                                @item.TipoServicio
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Cantidad)
+                                @item.EmpleadoUsuario?.NombreCompleto
+                            </td>
+
+                            <td>
+                                @item.ClienteUsuario?.NombreCompleto
+                            </td>
+
+                            <td class="price-cell">
+                                ₡@item.Total
+                            </td>
+
+                            <td>
+                                @item.FechaCreacion.ToString("dd/MM/yyyy")
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.PrecioUnitario)
+                                <a asp-action="Details"
+                                   asp-route-id="@item.IdTransaccionBiblioteca"
+                                   class="btn-custom btnDetails">
+                                    Detalles
+                                </a>
                             </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Subtotal)
-                            </td>
-                            <td class="actions-cell">
-                                <div class="action-buttons">
-                                    <a asp-action="Edit" asp-route-id="@item.IdTransaccionDetalle">Edit</a> |
-                                    <a asp-action="Details" asp-route-id="@item.IdTransaccionDetalle">Details</a> |
-                                    <a asp-action="Delete" asp-route-id="@item.IdTransaccionDetalle">Delete</a>
+
+                        </tr>
+
+                        <tr class="collapse-row">
+                            <td colspan="7" class="p-0">
+
+                                <div id="@collapseId" class="collapse">
+
+                                    <div class="details-container p-3">
+
+                                        @foreach (var detalle in item.Detalles)
+                                        {
+                                            <div class="detail-item d-flex justify-content-between">
+
+                                                <div>
+                                                    <span class="book-title">
+                                                        @detalle.Libro.Titulo
+                                                    </span>
+
+                                                    <span class="book-qty">
+                                                        Cantidad: @detalle.Cantidad
+                                                    </span>
+                                                </div>
+
+                                                <div class="price-cell">
+                                                    ₡@detalle.Subtotal
+                                                </div>
+
+                                            </div>
+                                        }
+
+                                    </div>
                                 </div>
+
                             </td>
                         </tr>
                     }
+
                 </tbody>
             </table>
+
         </div>
     </div>
 </section>
+<style>
+    .expand-toggle {
+        cursor: pointer;
+        width: 40px;
+        text-align: center;
+    }
+
+        .expand-toggle:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+    .collapse-row td {
+        border: none !important;
+    }
+
+    .table-responsive {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+
+    .glass-card.table-page {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .main-container {
+        align-items: flex-start !important;
+    }
+
+    .collapse {
+        overflow: visible !important;
+    }
+</style>

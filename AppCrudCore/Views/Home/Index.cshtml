@@ -1,8 +1,63 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<AppCrudCore.Models.ViewModels.Home.HomeCategoriaVM>
+
+@{
+    ViewData["Title"] = "Inicio Biblioteca";
 }
 
-<div class="text-center">
-    <h1 class="display-4">ESTA LOGUEADO CERDA</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+<section class="store-container">
+
+    @foreach (var categoria in Model)
+    {
+        <div class="category-section">
+
+            <h2 class="category-title">
+                @categoria.CategoriaNombre
+            </h2>
+
+            <div class="carousel">
+
+                <div class="carousel-track">
+
+                    @{
+                        var librosLoop =
+                        Enumerable.Range(0, 8)
+                        .SelectMany(_ => categoria.Libros)
+                        .ToList();
+                    }
+
+                    @foreach (var libro in librosLoop)
+                    {
+                        <div class="book-card">
+
+                            <img src="@libro.ImagenUrl"
+                                 alt="@libro.Titulo" />
+
+                            <div class="book-info">
+
+                                <h4>@libro.Titulo</h4>
+
+                                <p class="author">
+                                    @libro.Autor
+                                </p>
+
+                                <span class="price">
+                                    ₡@libro.PrecioVenta
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</section>
+<style>
+   
+</style>

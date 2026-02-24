@@ -18,6 +18,7 @@ namespace AppCrudCore.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var userId = int.Parse(
@@ -47,6 +48,7 @@ namespace AppCrudCore.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Edit()
         {
             var userId = int.Parse(
@@ -70,6 +72,7 @@ namespace AppCrudCore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(ProfileEditViewModel model)
         {
             if (!ModelState.IsValid)

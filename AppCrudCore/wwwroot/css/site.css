@@ -1,4 +1,4 @@
-html {
+锘縣tml {
   font-size: 14px;
 }
 
@@ -52,7 +52,7 @@ body {
     font-family: 'Segoe UI', Roboto, sans-serif;
     color: var(--text-main);
     display: flex;
-    justify-content: stretch;
+    justify-content: center;
 }
 
 .glass-card {
@@ -66,10 +66,17 @@ body {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-    .glass-card.table-page {
-        max-width: 1400px;
-        width: 95%;
-    }
+.glass-card {
+    width: 100%;
+    max-width: 850px;
+}
+
+.table-page {
+    flex: 1;
+    width: 100%;
+    max-width: 1600px; /* 馃憟 tama帽o dashboard ideal */
+    margin: 0 auto; /* centra elegantemente */
+}
 
 .form-header {
     text-align: center;
@@ -219,7 +226,17 @@ body {
     margin-top: 5px;
 }
 
-/* Responsivo para m髒iles */
+.input-error {
+    border: 2px solid #ff4d4d !important;
+    background: #2b0000;
+}
+
+.btn-primary-submit:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* Responsivo para m贸viles */
 @media (max-width: 600px) {
     .form-grid, .inventory-section {
         grid-template-columns: 1fr;
@@ -229,10 +246,6 @@ body {
 
 /*== tablas==*/
 /* Extensiones para la Tabla */
-.table-page {
-    max-width: 1200px !important; /* M醩 ancha para la tabla */
-    margin: 0 auto;
-}
 
 .table-header {
     display: flex;
@@ -266,7 +279,7 @@ body {
 .modern-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px; /* Espaciado entre filas */
+    border-spacing: 0 5px; /* Espaciado entre filas */
 }
 
     .modern-table thead th {
@@ -291,7 +304,7 @@ body {
 
         .modern-table tbody tr:hover {
             background: rgba(255, 255, 255, 0.08);
-            transform: scale(1.01);
+            /*transform: scale(1.01);*/
         }
 
     .modern-table td {
@@ -336,7 +349,7 @@ body {
     text-transform: uppercase;
 }
 
-    /* Colores para Estados (Ajustar seg鷑 tus valores) */
+    /* Colores para Estados (Ajustar seg煤n tus valores) */
     .status-pill.activo, .status-pill.completado {
         background: rgba(16, 185, 129, 0.2);
         color: #10b981;
@@ -369,11 +382,12 @@ body {
     color: var(--text-muted);
 }
 
-/* Botones de Acci髇 */
+/* Botones de Acci贸n */
 .action-buttons {
     display: flex;
-    gap: 10px;
     justify-content: center;
+    align-items: center;
+    gap: 6px;
 }
 
 .btn-icon {
@@ -388,9 +402,26 @@ body {
         transform: scale(1.2);
     }
 
+/* ===== BOTONES TABLA GLASS ===== */
+.btn-table-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: #e5e7eb;
+    backdrop-filter: blur(6px);
+    text-decoration: none;
+    transition: all .25s ease;
+}
 
-    /*===BOTON INTERNO EN INPUT*/
-/* Contenedor relativo para que el bot髇 se posicione respecto a este */
+
+    /*===BOTON PARA VISUALIZAR CONTRASE脩A*/
+/* Contenedor relativo para que el bot贸n se posicione respecto a este */
 .input-container {
     position: relative;
     display: flex;
@@ -403,7 +434,7 @@ body {
         padding-right: 45px; /* Espacio para que el texto no toque el ojo */
     }
 
-/* El bot髇 posicionado a la derecha */
+/* El bot贸n posicionado a la derecha */
 .toggle-input {
     position: absolute;
     right: 10px;
@@ -439,7 +470,7 @@ body {
     color: var(--text-main);
     font-weight: 500;
     margin-top: 4px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* L韓ea sutil */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* L铆nea sutil */
     padding-bottom: 5px;
 }
 
@@ -581,7 +612,7 @@ body {
     left: 0;
 }
 
-/* Bot髇 de Acci髇 */
+/* Bot贸n de Acci贸n */
 .primary-submit {
     width: 100%;
     background: #ffffff;
@@ -727,4 +758,270 @@ body {
     border-radius: 6px;
     text-decoration: none;
     color: black;
+}
+
+/*=====ACCESO DENEGADO====*/
+.denied-container {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.denied-card {
+    background: rgba(30,30,30,.75);
+    backdrop-filter: blur(14px);
+    border-radius: 18px;
+    padding: 50px;
+    text-align: center;
+    width: 420px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.5);
+    animation: fadeIn .5s ease;
+    color: #f1f5f9;
+}
+
+.icon-wrapper {
+    font-size: 70px;
+    margin-bottom: 15px;
+}
+
+.denied-card h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.message {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #cbd5e1;
+}
+
+.sub-message {
+    opacity: .7;
+    color: #94a3b8;
+    margin-bottom: 30px;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: .3s;
+}
+
+    .btn-primary:hover {
+        background: #43a047;
+    }
+
+.btn-secondary {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+    .btn-secondary:hover {
+        background: #777;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== BOTON BASE GLASS ===== */
+.btn-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    background: rgba(255,255,255,0.05);
+    transition: all .25s ease;
+}
+
+    .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+
+    .btn-custom:active {
+        transform: scale(.96);
+    }
+
+
+.btnEdit {
+    background: linear-gradient( 135deg, rgba(56,189,248,0.9), rgba(14,165,233,0.85) );
+    box-shadow: 0 0 12px rgba(56,189,248,0.35);
+}
+
+    .btnEdit:hover {
+        box-shadow: 0 0 18px rgba(56,189,248,0.6);
+    }
+
+
+
+.btnDetails {
+    background: rgba(255,255,255,0.06);
+    color: #d1d5db;
+}
+
+    .btnDetails:hover {
+        background: rgba(255,255,255,0.12);
+    }
+
+
+.btnDelete {
+    background: linear-gradient( 135deg, rgba(255,99,132,0.9), rgba(239,68,68,0.85) );
+    box-shadow: 0 0 12px rgba(239,68,68,0.35);
+}
+
+    .btnDelete:hover {
+        box-shadow: 0 0 18px rgba(239,68,68,0.6);
+    }
+
+    /*====activo - inactivo*/
+.dot-green, .dot-red {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-green {
+    background-color: #28a745;
+    box-shadow: 0 0 5px #28a745;
+}
+
+.dot-red {
+    background-color: #dc3545;
+    box-shadow: 0 0 5px #dc3545;
+}
+/*=====filtros===*/
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+    .filter-bar select,
+    .filter-bar input {
+        padding: 8px;
+        border-radius: 6px;
+    }
+
+    /*=====LIBROS HOME====*/
+.store-container {
+    padding: 40px;
+}
+
+.category-section {
+    margin-bottom: 50px;
+}
+
+.category-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: white;
+}
+
+/* ===== CAROUSEL ===== */
+
+.carousel {
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    animation: scrollLoop 40s linear infinite;
+}
+
+.carousel:hover .carousel-track {
+    animation-play-state: paused;
+}
+
+/* ===== CARD ===== */
+
+.book-card {
+    min-width: 200px;
+    background: rgba(255,255,255,.05);
+    border-radius: 18px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: .3s;
+    cursor: pointer;
+}
+
+    .book-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,.5);
+    }
+
+    .book-card img {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+    }
+
+/* INFO */
+
+.book-info {
+    padding: 15px;
+}
+
+    .book-info h4 {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+
+.author {
+    font-size: .8rem;
+    color: #94a3b8;
+}
+
+.price {
+    color: #10b981;
+    font-weight: 700;
+}
+
+/* ===== INFINITE EFFECT ===== */
+
+@keyframes scrollLoop {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
 }

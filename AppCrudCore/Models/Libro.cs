@@ -7,6 +7,10 @@ namespace AppCrudCore.Models
 
         public int IdLibro { get; set; }
 
+        [StringLength(300)]
+        [Display(Name = "Imagen")]
+        public string? ImagenUrl { get; set; }
+
         [Required(ErrorMessage = "El título es obligatorio")]
         [StringLength(200, ErrorMessage = "El título no puede superar los 200 caracteres")]
         public string Titulo { get; set; }

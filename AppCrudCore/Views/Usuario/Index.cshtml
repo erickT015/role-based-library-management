@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<AppCrudCore.Models.Usuario>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Usuarios";
 }
 
 <section class="main-container">
@@ -13,6 +13,19 @@
             </div>
             <a asp-controller="Usuario" asp-action="Create" class="btn btn-success mb-3">Nuevo</a>
         </header>
+        <form method="get" class="filter-bar">
+            <select name="RolId" asp-items="ViewBag.Roles">
+                <option value="">Todas</option>
+            </select>
+
+            <select name="activo">
+                <option value="">Todos</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+            </select>
+
+            <button type="submit" class="btn-create">Filtrar</button>
+        </form>
         <div class="table-responsive">
             <table class="modern-table">
                 <thead>
@@ -24,7 +37,6 @@
                         <th>Dirección</th>
                         <th>Fecha Regristo</th>
                         <th> Ultimo Login</th>
-                        <th>Requiere Cambio Pasword</th>
                         <th> Activo </th>
                         <th>Rol</th>
                         <th></th>
@@ -41,13 +53,21 @@
                             <td>@Html.DisplayFor(modelItem => item.Direccion)</td>
                             <td>@Html.DisplayFor(modelItem => item.FechaRegistro)</td>
                             <td>@Html.DisplayFor(modelItem => item.UltimoLogin)</td>
-                            <td>@Html.DisplayFor(modelItem => item.RequiereCambioPassword) </td>
-                            <td>@Html.DisplayFor(modelItem => item.Activo)</td>
+                            <td>
+                                @if (item.Activo)
+                                {
+                                    <span class="dot-green" title="Activo"></span>
+                                }
+                                else
+                                {
+                                    <span class="dot-red" title="Inactivo"></span>
+                                }
+                            </td>
                             <td> @Html.DisplayFor(modelItem => item.Rol.Nombre)</td>
                             <td>
-                                <a asp-action="Edit" asp-route-id="@item.IdUsuario">Edit</a> |
-                                <a asp-action="Details" asp-route-id="@item.IdUsuario">Details</a> |
-                                <a asp-action="Delete" asp-route-id="@item.IdUsuario">Delete</a>
+                                <a asp-action="Edit" class="btn-custom btnEdit" asp-route-id="@item.IdUsuario">Editar</a> |
+                                <a asp-action="Details" class="btn-custom btnDetails"  asp-route-id="@item.IdUsuario">Detalles</a> |
+                                <a asp-action="Delete" class="btn-custom btnDelete"  asp-route-id="@item.IdUsuario">Borrar</a>
                             </td>
                         </tr>
                     }

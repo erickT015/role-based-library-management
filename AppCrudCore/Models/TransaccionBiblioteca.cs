@@ -12,13 +12,6 @@ namespace AppCrudCore.Models
         public string NumeroTransaccion { get; set; }
 
         [Required]
-       // public int ClienteId { get; set; } //FK A TABLA CLIENTE (NO SE VA USAR EN UN FUTURO)
-       // public Cliente Cliente { get; set; }
-
-       // public int? EmpleadoId { get; set; } //FK A TABLA EMPLEADO (NO SE VA USAR EN UN FUTURO)
-       // public Empleado? Empleado { get; set; }
-
-
         public int UsuarioId { get; set; } //FK A TABLA USUARIO
         public Usuario Usuario { get; set; }
 
@@ -51,9 +44,9 @@ namespace AppCrudCore.Models
         [Required, Range(0.01, double.MaxValue, ErrorMessage = "Total debe ser mayor que 0.")]
         public decimal Total { get; set; }
 
-
-        [Required, Range(0.01, double.MaxValue, ErrorMessage = "Monto pagado debe ser mayor que 0.")]
-        public decimal MontoPagado { get; set; }
+        [Required(ErrorMessage = "El monto pagado es obligatorio")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Monto pagado debe ser mayor que 0.")]
+        public decimal? MontoPagado { get; set; }
 
 
         public string? ReferenciaPago { get; set; }

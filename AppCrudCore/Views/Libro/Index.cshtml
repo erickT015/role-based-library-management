@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<AppCrudCore.Models.Libro>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Libros";
 }
 
 <section class="main-container">
@@ -13,11 +13,27 @@
             </div>
             <a asp-action="Create" class="btn-create"> agregar Libro</a>
         </header>
+        <form method="get" class="filter-bar">
+            <select name="categoriaId" asp-items="ViewBag.Categorias">
+                <option value="">Todas</option>
+            </select>
+
+            <select name="activo">
+                <option value="">Todos</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+            </select>
+
+            <button type="submit" class="btn-create">Filtrar</button>
+        </form>
 
         <div class="table-responsive">
             <table class="modern-table">
                 <thead>
                     <tr>
+                        <th>
+                            Portada
+                        </th>
                         <th>
                             @Html.DisplayNameFor(model => model.Titulo)
                         </th>
@@ -34,16 +50,16 @@
                             @Html.DisplayNameFor(model => model.Resumen)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.PrecioVenta)
+                            Precio Venta
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.StockTotal)
+                            Stock Total
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.StockPrestamo)
+                           Stock Préstamo
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.StockVenta)
+                            Stock venta
                         </th>
                         <th>
                             @Html.DisplayNameFor(model => model.Activo)
@@ -58,6 +74,17 @@
                     @foreach (var item in Model)
                     {
                         <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                                {
+                                    <img src="@item.ImagenUrl"
+                                         class="table-book-img" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin imagen</span>
+                                }
+                            </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Titulo)
                             </td>
@@ -86,16 +113,23 @@
                                 @Html.DisplayFor(modelItem => item.StockVenta)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Activo)
+                                @if (item.Activo)
+                                {
+                                    <span class="dot-green" title="Activo"></span>
+                                }
+                                else
+                                {
+                                    <span class="dot-red" title="Inactivo"></span>
+                                }
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Categoria.Nombre)
                             </td>
                             <td class="actions-cell">
                                 <div class="action-buttons">
-                                    <a asp-action="Edit" asp-route-id="@item.IdLibro">Edit</a> |
-                                    <a asp-action="Details" asp-route-id="@item.IdLibro">Details</a> |
-                                    <a asp-action="Delete" asp-route-id="@item.IdLibro">Delete</a>
+                                    <a asp-action="Edit" class="btn-custom btnEdit" asp-route-id="@item.IdLibro">Editar</a> |
+                                    <a asp-action="Details" class="btn-custom btndetails" asp-route-id="@item.IdLibro">Detalles</a> |
+                                    <a asp-action="Delete" class="btn-custom btnDelete"  asp-route-id="@item.IdLibro">Borrar</a>
                                 </div>
                             </td>
                         </tr>
@@ -105,3 +139,18 @@
         </div>
     </div>
 </section>
+<style>
+    .table-book-img {
+        width: 50px;
+        height: 65px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,.1);
+        box-shadow: 0 4px 10px rgba(0,0,0,.3);
+        transition: transform .2s ease;
+    }
+
+        .table-book-img:hover {
+            transform: scale(1.15);
+        }
+</style>

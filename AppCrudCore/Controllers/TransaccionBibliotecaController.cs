@@ -2,12 +2,14 @@
 using AppCrudCore.Models;
 using AppCrudCore.Models.Enums;
 using AppCrudCore.Models.ViewModels.TransaccionBiblioteca;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace AppCrudCore.Controllers
@@ -41,21 +43,195 @@ namespace AppCrudCore.Controllers
             );
         }
 
+        private async Task CargarUsuariosSegunRol()
+        {
+            int usuarioLogueado =
+                int.Parse(User.FindFirstValue(
+                    ClaimTypes.NameIdentifier));
+
+            // CLIENTE
+            if (User.IsInRole("Cliente"))
+            {
+                // cliente = él mismo
+                ViewBag.Clientes = new SelectList(
+                    await _context.Usuario
+                        .Where(u => u.IdUsuario == usuarioLogueado)
+                        .Select(u => new
+                        {
+                            u.IdUsuario,
+                            u.NombreCompleto
+                        })
+                        .ToListAsync(),
+                    "IdUsuario",
+                    "NombreCompleto",
+                    usuarioLogueado
+                );
+
+                // empleado sistema
+                const int EMPLEADO_WEB_ID = 5;
+
+                ViewBag.Empleados = new SelectList(
+                    await _context.Usuario
+                        .Where(u => u.IdUsuario == EMPLEADO_WEB_ID)
+                        .Select(u => new
+                        {
+                            u.IdUsuario,
+                            u.NombreCompleto
+                        })
+                        .ToListAsync(),
+                    "IdUsuario",
+                    "NombreCompleto",
+                    EMPLEADO_WEB_ID
+                );
+            }
+            // ===============================
+            // EMPLEADO / ADMIN
+            // ===============================
+            else
+            {
+                // todos los clientes
+                ViewBag.Clientes = new SelectList(
+                    await _context.Usuario
+                        .Where(u => u.Rol.Nombre == "Cliente")
+                        .Select(u => new
+                        {
+                            u.IdUsuario,
+                            u.NombreCompleto
+                        })
+                        .ToListAsync(),
+                    "IdUsuario",
+                    "NombreCompleto"
+                );
+
+                // empleado = logueado
+                ViewBag.Empleados = new SelectList(
+                    await _context.Usuario
+                        .Where(u => u.IdUsuario == usuarioLogueado)
+                        .Select(u => new
+                        {
+                            u.IdUsuario,
+                            u.NombreCompleto
+                        })
+                        .ToListAsync(),
+                    "IdUsuario",
+                    "NombreCompleto",
+                    usuarioLogueado
+                );
+            }
+        }
+
 
         // GET: TransaccionBiblioteca
-        public async Task<IActionResult> Index()
+        [Authorize]
+        public async Task<IActionResult> Index(
+    int? servicioId,
+    int? estadoId,
+    int? origenId,
+    DateOnly? fecha)
         {
-            var appDBContext = _context.TransaccionBiblioteca
+            var userIdString =
+                User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            int userId = int.Parse(userIdString);
+
+            IQueryable<TransaccionBiblioteca> query =
+                _context.TransaccionBiblioteca
                 .Include(t => t.ClienteUsuario)
-        .Include(t => t.EmpleadoUsuario)
-        .Include(t => t.Usuario)
+                .Include(t => t.EmpleadoUsuario)
+                .Include(t => t.Usuario)
                 .Include(t => t.Detalles)
-                .ThenInclude(d => d.Libro);
-            return View(await appDBContext.ToListAsync());
+                    .ThenInclude(d => d.Libro)
+                .AsQueryable();
+
+            // =========================
+            // CLIENTE SOLO SUS DATOS
+            // =========================
+            if (User.IsInRole("Cliente"))
+                query = query.Where(t =>
+                    t.ClienteUsuarioId == userId);
+
+            // =========================
+            // ENUM FILTROS
+            // =========================
+
+            if (servicioId.HasValue &&
+                Enum.IsDefined(typeof(TipoServicio), servicioId))
+            {
+                var tipo = (TipoServicio)servicioId.Value;
+                query = query.Where(t =>
+                    t.TipoServicio == tipo);
+            }
+
+            if (estadoId.HasValue &&
+                Enum.IsDefined(typeof(EstadoTransaccion), estadoId))
+            {
+                var estado =
+                    (EstadoTransaccion)estadoId.Value;
+
+                query = query.Where(t =>
+                    t.Estado == estado);
+            }
+
+            if (origenId.HasValue &&
+                Enum.IsDefined(typeof(OrigenTransaccion), origenId))
+            {
+                var origen =
+                    (OrigenTransaccion)origenId.Value;
+
+                query = query.Where(t =>
+                    t.Origen == origen);
+            }
+
+            // =========================
+            // FECHA
+            // =========================
+            if (fecha.HasValue)
+            {
+                query = query.Where(t =>
+                    DateOnly.FromDateTime(
+                        t.FechaCreacion) == fecha.Value);
+            }
+
+            // =========================
+            // DROPDOWNS ENUM
+            // =========================
+
+            ViewBag.Servicios =
+                CrearEnumSelectList<TipoServicio>(servicioId);
+
+            ViewBag.Estados =
+                CrearEnumSelectList<EstadoTransaccion>(estadoId);
+
+            ViewBag.Origenes =
+                CrearEnumSelectList<OrigenTransaccion>(origenId);
+
+            ViewBag.Fecha = fecha;
+
+            return View(await query.ToListAsync());
+        }
+
+
+        //metodo generico para crear select list de enums
+        private SelectList CrearEnumSelectList<T>(int? selected)
+    where T : Enum
+        {
+            var values = Enum.GetValues(typeof(T))
+                .Cast<T>()
+                .Select(e => new
+                {
+                    Id = Convert.ToInt32(e),
+                    Nombre = e.ToString()
+                });
+
+            return new SelectList(values,
+                "Id",
+                "Nombre",
+                selected);
         }
 
 
         // GET: TransaccionBiblioteca/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -65,7 +241,10 @@ namespace AppCrudCore.Controllers
 
             var transaccionBiblioteca = await _context.TransaccionBiblioteca
                 .Include(t => t.Usuario)
-                //.Include(t => t.Empleado)
+                .Include(t => t.ClienteUsuario)
+                .Include(t => t.EmpleadoUsuario)
+                .Include(t => t.Detalles)
+                    .ThenInclude(l => l.Libro)
                 .FirstOrDefaultAsync(m => m.IdTransaccionBiblioteca == id);
             if (transaccionBiblioteca == null)
             {
@@ -95,7 +274,7 @@ namespace AppCrudCore.Controllers
                     isbn = l.ISBN,
                     precio = l.PrecioVenta,
                     stockVenta = l.StockVenta,
-                    precioPrestamo= l.PrecioPrestamo,
+                    precioPrestamo = l.PrecioPrestamo,
                     stockPrestamo = l.StockPrestamo,
                     stockTotal = l.StockTotal,
                     text = $"{l.Titulo} | ISBN: {l.ISBN} | Sale: {l.StockVenta} | Rent: {l.StockPrestamo}"
@@ -107,39 +286,10 @@ namespace AppCrudCore.Controllers
 
 
         //GET
-        public IActionResult Create()
+        [Authorize]
+        public async Task<IActionResult> Create()
         {
-            /*ViewBag.Cliente = new SelectList(
-                _context.Cliente.Where(c => c.Activo),
-                "IdCliente",
-                "NombreCompleto"
-            );
-
-            ViewBag.Empleados = new SelectList(
-                _context.Empleados.Where(e => e.Activo),
-                "IdEmpleado",
-                "NombreCompleto"
-            );*/
-
-            ViewBag.Clientes = new SelectList(
-        _context.Usuario
-            .Where(u => u.Activo && u.Rol.Nombre == "Cliente")
-            .OrderBy(u => u.NombreCompleto)
-            .ToList(),
-        "IdUsuario",
-        "NombreCompleto"
-    );
-
-            ViewBag.Empleados = new SelectList(
-                _context.Usuario
-                    .Where(u => u.Activo && (u.Rol.Nombre == "Empleado" || u.Rol.Nombre == "Admin"))
-                    .OrderBy(u => u.NombreCompleto)
-                    .ToList(),
-                "IdUsuario",
-                "NombreCompleto"
-            );
-
-            // CargarViewBag();
+            await CargarUsuariosSegunRol();
             return View();
         }
 
@@ -160,52 +310,104 @@ namespace AppCrudCore.Controllers
         }
 
 
-        //POST:
+        //POST: CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TransaccionBibliotecaCreateViewModel model)
+        [Authorize]
+        public async Task<IActionResult> Create(
+            TransaccionBibliotecaCreateViewModel model)
         {
-            await CargarViewBag();
-            if (!ModelState.IsValid)
-                return View(model);
+            await CargarUsuariosSegunRol();
 
-            using var dbTransaction = await _context.Database.BeginTransactionAsync();
+            if (!ModelState.IsValid)
+            return View(model);     
+
+            // VALIDAR DETALLES
+            if (model.Detalles == null || !model.Detalles.Any())
+            {
+                ModelState.AddModelError("",
+                    "Debe agregar al menos un libro.");
+                return View(model);
+            }
+
+            // USUARIO LOGUEADO
+            int usuarioLogueado = int.Parse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            // CLIENTE NO PUEDE PRESTAR
+            if (User.IsInRole("Cliente") &&
+                model.TipoServicio == TipoServicio.Prestamo)
+            {
+                ModelState.AddModelError("",
+                    "Los clientes no pueden realizar préstamos.");
+                return View(model);
+            }
+
+            using var dbTransaction =
+                await _context.Database.BeginTransactionAsync();
 
             try
             {
                 var transaccion = new TransaccionBiblioteca
                 {
-                    NumeroTransaccion = await GenerarNumeroTransaccion(),
-
-                    ClienteUsuarioId = model.ClienteUsuarioId,
-
-                    EmpleadoUsuarioId = model.EmpleadoUsuarioId,
-
-                    // Usuario que creó el registro (temporal)
-                    UsuarioId = model.EmpleadoUsuarioId,
+                    NumeroTransaccion =
+                        await GenerarNumeroTransaccion(),
 
                     TipoServicio = model.TipoServicio,
                     Origen = model.Origen,
-                    Estado = model.TipoServicio == TipoServicio.Prestamo
-                    ? EstadoTransaccion.Prestado
-                    : EstadoTransaccion.Vendido,
                     TipoPago = model.TipoPago,
 
                     FechaCreacion = DateTime.Now,
 
-                    FechaDevolucion = model.TipoServicio == TipoServicio.Prestamo
+                    FechaDevolucion =
+                        model.TipoServicio == TipoServicio.Prestamo
                         ? model.FechaDevolucion
                         : null,
 
                     ReferenciaPago = model.ReferenciaPago,
-                    Observaciones = model.Observaciones
+                    Observaciones = model.Observaciones,
+
+                    Estado =
+                        model.TipoServicio == TipoServicio.Prestamo
+                        ? EstadoTransaccion.Prestado
+                        : EstadoTransaccion.Vendido
                 };
 
-                decimal total = 0;
+                //  ASIGNACIÓN SEGURA USUARIOS
 
+                if (User.IsInRole("Cliente"))
+                {
+                    // Cliente compra para sí mismo
+                    transaccion.ClienteUsuarioId =
+                        usuarioLogueado;
+
+                    // empleado del sistema
+                    transaccion.EmpleadoUsuarioId =
+                        model.EmpleadoUsuarioId;
+
+                    transaccion.UsuarioId =
+                        usuarioLogueado;
+                }
+                else
+                {
+                    // empleado autenticado atiende
+                    transaccion.EmpleadoUsuarioId =
+                        usuarioLogueado;
+
+                    transaccion.ClienteUsuarioId =
+                        model.ClienteUsuarioId;
+
+                    transaccion.UsuarioId =
+                        usuarioLogueado;
+                }
+
+                decimal total = 0;
+                // DETALLES MULTILIBRO
                 foreach (var item in model.Detalles)
                 {
-                    var libro = await _context.Libro.FindAsync(item.LibroId);
+                    var libro = await _context.Libro
+                        .FirstOrDefaultAsync(l =>
+                            l.IdLibro == item.LibroId);
 
                     if (libro == null)
                         throw new Exception("Libro no existe");
@@ -215,10 +417,12 @@ namespace AppCrudCore.Controllers
                         ? libro.PrecioPrestamo
                         : libro.PrecioVenta;
 
+                    // VALIDAR STOCK
                     if (model.TipoServicio == TipoServicio.Venta)
                     {
                         if (libro.StockVenta < item.Cantidad)
-                            throw new Exception($"Stock insuficiente: {libro.Titulo}");
+                            throw new Exception(
+                                $"Stock insuficiente: {libro.Titulo}");
 
                         libro.StockVenta -= item.Cantidad;
                         libro.StockTotal -= item.Cantidad;
@@ -226,31 +430,36 @@ namespace AppCrudCore.Controllers
                     else
                     {
                         if (libro.StockPrestamo < item.Cantidad)
-                            throw new Exception($"Stock préstamo insuficiente: {libro.Titulo}");
+                            throw new Exception(
+                                $"Stock préstamo insuficiente: {libro.Titulo}");
 
                         libro.StockPrestamo -= item.Cantidad;
                     }
 
-                    var subtotal = precioUnitario * item.Cantidad;
+                    var subtotal =
+                        precioUnitario * item.Cantidad;
 
-                    transaccion.Detalles.Add(new TransaccionDetalle
-                    {
-                        LibroId = item.LibroId,
-                        Cantidad = item.Cantidad,
-                        PrecioUnitario = precioUnitario,
-                        Subtotal = subtotal
-                    });
+                    transaccion.Detalles.Add(
+                        new TransaccionDetalle
+                        {
+                            LibroId = item.LibroId,
+                            Cantidad = item.Cantidad,
+                            PrecioUnitario = precioUnitario,
+                            Subtotal = subtotal
+                        });
 
                     total += subtotal;
                 }
 
+                // TOTALES
                 transaccion.Total = total;
                 transaccion.MontoPagado = model.MontoPagado;
+                if (transaccion.MontoPagado < transaccion.Total)
+                    throw new Exception("Pago insuficiente.");
 
                 _context.TransaccionBiblioteca.Add(transaccion);
 
                 await _context.SaveChangesAsync();
-
                 await dbTransaction.CommitAsync();
 
                 return RedirectToAction(nameof(Index));
@@ -258,16 +467,19 @@ namespace AppCrudCore.Controllers
             catch (Exception ex)
             {
                 await dbTransaction.RollbackAsync();
-                var error = ex.InnerException?.Message ?? ex.Message;
-                ModelState.AddModelError("", error);
 
-                await CargarViewBag();
+                ModelState.AddModelError("",
+                    ex.InnerException?.Message ?? ex.Message);
+
+                await CargarUsuariosSegunRol();
                 return View(model);
             }
         }
 
 
 
+        //GET: EDIT
+        [Authorize(Policy = "AdminOrEmpleado")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -291,8 +503,11 @@ namespace AppCrudCore.Controllers
             return View(model);
         }
 
+
+        //POST: EDIT
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminOrEmpleado")]
         public async Task<IActionResult> Edit(TransaccionBibliotecaEditViewModel model)
         {
             if (!ModelState.IsValid)
@@ -306,7 +521,6 @@ namespace AppCrudCore.Controllers
 
             try
             {
-                // reglas de negocio opcionales
                 if (transaccion.Estado == EstadoTransaccion.Cancelado)
                 {
                     ModelState.AddModelError("", "No se puede editar una transacción cancelada.");

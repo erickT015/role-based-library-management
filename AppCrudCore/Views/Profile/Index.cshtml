@@ -1,53 +1,80 @@
 ﻿@model AppCrudCore.Models.ViewModels.Profile.ProfileIndexViewModel
 
-<div class="profile-container">
+@{
+    ViewData["Title"] = "Mi perfil";
+}
 
-    <div class="profile-card">
+<section class="main-container">
 
-        <div class="profile-header">
-            <div class="avatar">
+    <div class="glass-card" style="max-width:900px;">
+
+        <!-- HEADER -->
+        <div class="form-header">
+
+            <div class="avatar"
+                 style="width:90px;height:90px;font-size:36px;">
                 @Model.NombreCompleto.Substring(0, 1)
             </div>
 
-            <h2>@Model.NombreCompleto</h2>
-            <span class="role">@Model.RolNombre</span>
-        </div>
+            <h1 class="title">@Model.NombreCompleto</h1>
 
-        <div class="profile-info">
-
-            <div class="info-row">
-                <label>Correo</label>
-                <span>@Model.Correo</span>
-            </div>
-
-            <div class="info-row">
-                <label>Cédula</label>
-                <span>@Model.Cedula</span>
-            </div>
-
-            <div class="info-row">
-                <label>Teléfono</label>
-                <span>@Model.Telefono</span>
-            </div>
-
-            <div class="info-row">
-                <label>Dirección</label>
-                <span>@Model.Direccion</span>
-            </div>
-
-            <div class="info-row">
-                <label>Último acceso</label>
-                <span>@Model.UltimoLogin</span>
-            </div>
+            <span class="badge-role">
+                @Model.RolNombre
+            </span>
 
         </div>
 
-        <div class="profile-actions">
-            <a asp-action="Edit" class="btn-primary">
-                Editar Perfil
+        <div class="separator"></div>
+
+        <!-- INFO GRID -->
+        <div class="form-grid">
+
+            <div class="detail-block">
+                <span class="field-label">Correo</span>
+                <div class="detail-value">@Model.Correo</div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Cédula</span>
+                <div class="detail-value">@Model.Cedula</div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Teléfono</span>
+                <div class="detail-value">@Model.Telefono</div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Dirección</span>
+                <div class="detail-value">@Model.Direccion</div>
+            </div>
+
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- LOGIN INFO -->
+        <div class="summary-card">
+
+            <div class="summary-item">
+                <span class="label">Último Acceso</span>
+                <span class="value">
+                    @Model.UltimoLogin
+                </span>
+            </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions">
+
+            <a asp-action="Edit"
+               class="btn-custom btnEdit">
+                ✏️ Editar Perfil
             </a>
+
         </div>
 
     </div>
 
-</div>
+</section>

@@ -1,51 +1,96 @@
 ﻿@model AppCrudCore.Models.ViewModels.Profile.ProfileEditViewModel
 
-<div class="profile-container">
+@{
+    ViewData["Title"] = "Editar Perfil";
+}
 
-    <form asp-action="Edit" method="post" class="profile-card">
+<section class="main-container">
 
-        <h2>Editar Perfil</h2>
+    <form asp-action="Edit"
+          method="post"
+          class="glass-card"
+          style="max-width:900px;">
 
-        <div class="form-group">
-            <label>Nombre completo</label>
-            <input asp-for="NombreCompleto" class="input" />
-            <span asp-validation-for="NombreCompleto"></span>
+        <div class="form-header">
+            <h1 class="title">Editar Perfil</h1>
+            <p class="subtitle">
+                Actualiza tu información personal
+            </p>
         </div>
 
-        <div class="form-group">
-            <label>Teléfono</label>
-            <input asp-for="Telefono" class="input" />
+        <!-- DATOS PERSONALES -->
+        <div class="form-grid">
+
+            <div class="input-group">
+                <label class="field-label">
+                    Nombre completo
+                </label>
+                <input asp-for="NombreCompleto"
+                       class="custom-input"/>
+            </div>
+
+            <div class="input-group">
+                <label class="field-label">
+                    Teléfono
+                </label>
+                <input asp-for="Telefono"
+                       class="custom-input"/>
+            </div>
+
+            <div class="input-group full-width">
+                <label class="field-label">
+                    Dirección
+                </label>
+                <input asp-for="Direccion"
+                       class="custom-input"/>
+            </div>
+
         </div>
 
-        <div class="form-group">
-            <label>Dirección</label>
-            <input asp-for="Direccion" class="input" />
+        <div class="separator"></div>
+
+        <!-- PASSWORD -->
+        <h3 class="subtitle text-center">
+            Seguridad
+        </h3>
+
+        <div class="form-grid">
+
+            <div class="input-group">
+                <label class="field-label">
+                    Nueva contraseña
+                </label>
+                <input asp-for="NuevaPassword"
+                       type="password"
+                       class="custom-input"/>
+            </div>
+
+            <div class="input-group">
+                <label class="field-label">
+                    Confirmar contraseña
+                </label>
+                <input asp-for="ConfirmarPassword"
+                       type="password"
+                       class="custom-input"/>
+            </div>
+
         </div>
 
-        <hr />
+        <!-- ACTIONS -->
+        <div class="actions">
 
-        <h4>Cambiar contraseña</h4>
-
-        <div class="form-group">
-            <label>Nueva contraseña</label>
-            <input asp-for="NuevaPassword" type="password" class="input" />
-        </div>
-
-        <div class="form-group">
-            <label>Confirmar contraseña</label>
-            <input asp-for="ConfirmarPassword" type="password" class="input" />
-        </div>
-
-        <div class="profile-actions">
-            <button type="submit" class="btn-primary">
-                Guardar Cambios
+            <button type="submit"
+                    class="btn-primary-submit">
+                💾 Guardar Cambios
             </button>
 
-            <a asp-action="Index" class="btn-secondary">
-                Cancelar
+            <a asp-action="Index"
+               class="btn-back">
+                ← Cancelar
             </a>
+
         </div>
 
     </form>
 
-</div>
+</section>

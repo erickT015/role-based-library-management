@@ -1,48 +1,153 @@
-﻿@model AppCrudCore.Models.TransaccionDetalle
+﻿@model AppCrudCore.Models.TransaccionBiblioteca
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle Transacción";
 }
+<section class="main-container">
 
-<h1>Details</h1>
+    <div class="glass-card" style="max-width:1100px;">
 
-<div>
-    <h4>TransaccionDetalle</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TransaccionBiblioteca)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TransaccionBiblioteca.IdTransaccionBiblioteca)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Libro)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Libro.Autor)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cantidad)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cantidad)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PrecioUnitario)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PrecioUnitario)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Subtotal)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Subtotal)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdTransaccionDetalle">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+        <div class="form-header">
+            <h1 class="title">
+                Transacción #@Model.IdTransaccionBiblioteca
+            </h1>
+
+            <p class="subtitle">
+                Detalle completo de operación
+            </p>
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- INFO GENERAL -->
+        <div class="form-grid">
+
+            <div class="detail-block">
+                <span class="field-label">Atendido por</span>
+                <div class="detail-value">
+                    @Model.EmpleadoUsuario?.NombreCompleto
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Cliente</span>
+                <div class="detail-value">
+                    @Model.ClienteUsuario?.NombreCompleto
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Medio de Pago</span>
+                <div class="detail-value">
+                    @Model.Origen
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Estado</span>
+                <div class="detail-value">
+                    <span class="status-pill @Model.Estado.ToString().ToLower()">
+                        @Model.Estado
+                    </span>
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Fecha</span>
+                <div class="detail-value">
+                    @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
+            <div class="detail-block">
+                <span class="field-label">Fecha</span>
+                <div class="detail-value">
+                    @Model.FechaDevolucion?.ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
+
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- LIBROS -->
+        <h3 class="subtitle text-center mb-3">
+            Libros incluidos
+        </h3>
+
+        <div class="table-responsive">
+
+            <table class="modern-table">
+
+                <thead>
+                    <tr>
+                        <th>Libro</th>
+                        <th>Autor</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var detalle in Model.Detalles)
+                    {
+                        <tr>
+
+                            <td>
+                                <span class="book-title">
+                                    @detalle.Libro.Titulo
+                                </span>
+                            </td>
+
+                            <td>
+                                @detalle.Libro.Autor
+                            </td>
+
+                            <td>
+                                @detalle.Cantidad
+                            </td>
+
+                            <td>
+                                ₡@detalle.PrecioUnitario
+                            </td>
+
+                            <td class="price-cell">
+                                ₡@detalle.Subtotal
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- TOTAL -->
+        <div class="summary-card">
+
+            <div class="summary-item total">
+                <span class="label">TOTAL</span>
+                <span class="value">
+                    ₡@Model.Total
+                </span>
+            </div>
+
+        </div>
+
+        <div class="actions">
+
+            <a asp-action="Index"
+               class="btn-back">
+                ← Volver al historial
+            </a>
+
+        </div>
+
+    </div>
+
+</section>

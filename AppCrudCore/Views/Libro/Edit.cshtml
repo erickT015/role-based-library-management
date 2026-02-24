@@ -1,84 +1,138 @@
 ﻿@model AppCrudCore.Models.Libro
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Libro";
 }
 
-<h1>Edit</h1>
+<section class="main-container">
 
-<h4>Libro</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="glass-card">
+
+        <!-- HEADER -->
+        <div class="form-header">
+            <h1 class="title">Editar Libro</h1>
+            <p class="subtitle">
+                Actualiza la información del libro seleccionado
+            </p>
+        </div>
+
+        <form asp-action="Edit" enctype="multipart/form-data">
+
             <input type="hidden" asp-for="IdLibro" />
-            <div class="form-group">
-                <label asp-for="Titulo" class="control-label"></label>
-                <input asp-for="Titulo" class="form-control" />
-                <span asp-validation-for="Titulo" class="text-danger"></span>
+
+            <div asp-validation-summary="ModelOnly"
+                 class="validation-text"></div>
+
+            <!-- GRID -->
+            <div class="form-grid">
+                <div class="input-group">
+                    <label class="field-label">Imagen</label>
+
+                    <input type="file"
+                           name="imagenArchivo"
+                           accept="image/*"
+                           class="custom-input" />
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="Titulo" class="field-label"></label>
+                    <input asp-for="Titulo" class="custom-input" />
+                    <span asp-validation-for="Titulo" class="validation-text"></span>
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="Autor" class="field-label"></label>
+                    <input asp-for="Autor" class="custom-input" />
+                    <span asp-validation-for="Autor" class="validation-text"></span>
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="ISBN" class="field-label"></label>
+                    <input asp-for="ISBN" class="custom-input" />
+                    <span asp-validation-for="ISBN" class="validation-text"></span>
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="AnioPublicacion" class="field-label"></label>
+                    <input asp-for="AnioPublicacion" class="custom-input" />
+                    <span asp-validation-for="AnioPublicacion" class="validation-text"></span>
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="PrecioVenta" class="field-label"></label>
+                    <input asp-for="PrecioVenta" class="custom-input" />
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="CategoriaId" class="field-label"></label>
+                    <select asp-for="CategoriaId"
+                            class="custom-select"
+                            asp-items="ViewBag.CategoriaId">
+                    </select>
+                </div>
+
             </div>
-            <div class="form-group">
-                <label asp-for="Autor" class="control-label"></label>
-                <input asp-for="Autor" class="form-control" />
-                <span asp-validation-for="Autor" class="text-danger"></span>
+
+            <div class="separator"></div>
+
+            <!-- INVENTARIO -->
+            <div class="inventory-section">
+
+                <div class="input-group">
+                    <label asp-for="StockTotal" class="field-label"></label>
+                    <input asp-for="StockTotal" class="custom-input" />
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="StockPrestamo" class="field-label"></label>
+                    <input asp-for="StockPrestamo" class="custom-input" />
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="StockVenta" class="field-label"></label>
+                    <input asp-for="StockVenta" class="custom-input" />
+                </div>
+
             </div>
-            <div class="form-group">
-                <label asp-for="ISBN" class="control-label"></label>
-                <input asp-for="ISBN" class="form-control" />
-                <span asp-validation-for="ISBN" class="text-danger"></span>
+
+            <div class="input-group">
+                <label asp-for="Resumen" class="field-label"></label>
+                <textarea asp-for="Resumen"
+                          class="custom-input"
+                          rows="3"></textarea>
             </div>
-            <div class="form-group">
-                <label asp-for="AnioPublicacion" class="control-label"></label>
-                <input asp-for="AnioPublicacion" class="form-control" />
-                <span asp-validation-for="AnioPublicacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Resumen" class="control-label"></label>
-                <input asp-for="Resumen" class="form-control" />
-                <span asp-validation-for="Resumen" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PrecioVenta" class="control-label"></label>
-                <input asp-for="PrecioVenta" class="form-control" />
-                <span asp-validation-for="PrecioVenta" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StockTotal" class="control-label"></label>
-                <input asp-for="StockTotal" class="form-control" />
-                <span asp-validation-for="StockTotal" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StockPrestamo" class="control-label"></label>
-                <input asp-for="StockPrestamo" class="form-control" />
-                <span asp-validation-for="StockPrestamo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StockVenta" class="control-label"></label>
-                <input asp-for="StockVenta" class="form-control" />
-                <span asp-validation-for="StockVenta" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Activo" /> @Html.DisplayNameFor(model => model.Activo)
+
+            <!-- ACTIVO -->
+            <div class="input-group">
+                <label class="field-label">
+                    <input asp-for="Activo" />
+                    Libro Activo
                 </label>
             </div>
-            <div class="form-group">
-                <label asp-for="CategoriaId" class="control-label"></label>
-                <select asp-for="CategoriaId" class="form-control" asp-items="ViewBag.CategoriaId"></select>
-                <span asp-validation-for="CategoriaId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+            <!-- ACTIONS -->
+            <div class="actions">
+
+                <button type="submit"
+                        class="btn-primary-submit">
+                    💾 Guardar Cambios
+                </button>
+
+                <a asp-action="Index"
+                   class="btn-back">
+                    ← Volver al listado
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

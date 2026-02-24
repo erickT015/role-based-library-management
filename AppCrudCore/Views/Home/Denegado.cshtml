@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Acceso Denegado";
+    Layout = "_Layout";
+}
+
+<section class="denied-container">
+
+    <div class="denied-card">
+
+        <div class="icon-wrapper">
+            🔒
+        </div>
+
+        <h1>Acceso Denegado</h1>
+
+        <p class="message">
+            No tienes permisos para acceder a esta sección.
+        </p>
+
+        <p class="sub-message">
+            Si crees que esto es un error, contacta al administrador del sistema.
+        </p>
+
+        <div class="actions">
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-light">
+                Volver al Inicio
+            </a>
+
+            <button onclick="history.back()"
+                    class="btn-secondary back">
+                Regresar
+            </button>
+        </div>
+
+    </div>
+
+</section>

@@ -1,67 +1,143 @@
 ﻿@model AppCrudCore.Models.TransaccionBiblioteca
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle Operación";
 }
 
-<h1>Details</h1>
+<section class="main-container">
 
-<div>
-    <h4>TransaccionBiblioteca</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-           Datos Cliente
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ClienteUsuario.Cedula)
-            @Html.DisplayFor(model => model.ClienteUsuario.NombreCompleto)
-        </dd>
-        <dt class = "col-sm-2">
-            Empleado
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EmpleadoUsuario.Cedula)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipoServicio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipoServicio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Origen)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Origen)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Total)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Total)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaCreacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaCreacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaCompletada)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaCompletada)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdTransaccionBiblioteca">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="glass-card table-page">
+
+        <!-- HEADER -->
+        <div class="form-header">
+            <h1 class="title">
+                Operación #@Model.IdTransaccionBiblioteca
+            </h1>
+            <p class="subtitle">
+                Información completa de la transacción
+            </p>
+        </div>
+
+        <!-- INFO GRID -->
+        <div class="form-grid">
+
+            <div class="detail-block">
+                <span class="field-label">Cliente</span>
+                <div class="detail-value">
+                    @Model.ClienteUsuario.NombreCompleto
+                    <br />
+                    <small>@Model.ClienteUsuario.Cedula</small>
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Empleado</span>
+                <div class="detail-value">
+                    @Model.EmpleadoUsuario.Cedula
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Tipo Servicio</span>
+                <div class="detail-value">
+                    @Model.TipoServicio
+                </div>
+            </div>
+
+            <div class="detail-block">
+                <span class="field-label">Estado</span>
+                <div class="detail-value">
+                    <span class="status-pill completado">
+                        @Model.Estado
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- DETALLE TABLA -->
+        <h3 class="subtitle">Detalle de Libros</h3>
+
+        <div class="table-responsive">
+
+            <table class="modern-table">
+
+                <thead>
+                    <tr>
+                        <th>Libro</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var d in Model.Detalles)
+                    {
+                        <tr>
+
+                            <td>
+                                <span class="book-title">
+                                    @d.Libro.Titulo
+                                </span>
+                            </td>
+
+                            <td>@d.Cantidad</td>
+
+                            <td class="price-cell">
+                                ₡ @d.PrecioUnitario
+                            </td>
+
+                            <td class="price-cell">
+                                ₡ @(d.Cantidad* d.PrecioUnitario)
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- TOTAL -->
+        <div class="summary-card">
+
+            <div class="summary-item">
+                <span class="label">Fecha Creación</span>
+                <span class="value">
+                    @Model.FechaCreacion.ToShortDateString()
+                </span>
+            </div>
+
+            <div class="summary-item total">
+                <span class="label">Total</span>
+                <span class="value">
+                    ₡ @Model.Total
+                </span>
+            </div>
+
+        </div>
+
+        <div class="actions">
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.IdTransaccionBiblioteca"
+               class="btn-primary-submit">
+                Editar
+            </a>
+
+            <a asp-action="Index"
+               class="btn-back">
+                ← Volver
+            </a>
+
+        </div>
+
+    </div>
+
+</section>

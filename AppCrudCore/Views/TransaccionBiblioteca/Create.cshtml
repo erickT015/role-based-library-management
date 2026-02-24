@@ -1,417 +1,626 @@
-﻿@model AppCrudCore.Models.ViewModels.TransaccionBiblioteca.TransaccionBibliotecaCreateViewModel;
+﻿@model AppCrudCore.Models.ViewModels.TransaccionBiblioteca.TransaccionBibliotecaCreateViewModel
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nueva Operación";
 }
 
 <section class="main-container">
     <div class="glass-card">
+
         <header class="form-header">
             <h1 class="title">Nueva Transacción</h1>
-            <p class="subtitle">Gestión de Biblioteca - Registro de Servicios</p>
+            <p class="subtitle">
+                Gestión de Biblioteca - Registro de Servicios
+            </p>
         </header>
 
         <div class="form-wrapper">
-            <div asp-validation-summary="All" class="error-summary"></div>
 
-            <form asp-controller="TransaccionBiblioteca" asp-action="Create" method="post" class="modern-form">
+            <div asp-validation-summary="All"
+                 class="error-summary"></div>
 
+            <form asp-controller="TransaccionBiblioteca"
+                  asp-action="Create"
+                  method="post"
+                  class="modern-form">
                 <div class="form-grid">
                     <div class="input-group">
-                        <label class="field-label">Cliente</label>
-                        <select asp-for="ClienteUsuarioId" asp-items="ViewBag.Clientes" class="custom-select"></select>
-                        <span asp-validation-for="ClienteUsuarioId" class="error-text"></span>
-                    </div>
-
-                    <div class="input-group">
                         <label class="field-label">Empleado</label>
-                        <select asp-for="EmpleadoUsuarioId" asp-items="ViewBag.Empleados" class="custom-select"></select>
-                        <span asp-validation-for="EmpleadoUsuarioId" class="error-text"></span>
+                        <select asp-for="EmpleadoUsuarioId"
+                                asp-items="ViewBag.Empleados"
+                                id="EmpleadoUsuarioId"
+                                class="custom-select">
+                        </select>
+                        <span asp-validation-for="EmpleadoUsuarioId"
+                              class="error-text"></span>
                     </div>
-
+                    <div class="input-group">
+                        <label class="field-label">Cliente</label>
+                        <select asp-for="ClienteUsuarioId"
+                                asp-items="ViewBag.Clientes"
+                                id="ClienteUsuarioId"
+                                class="custom-select">
+                        </select>
+                        <span asp-validation-for="ClienteUsuarioId"
+                              class="error-text"></span>
+                    </div>
                     <div class="input-group">
                         <label class="field-label">Tipo Servicio</label>
-                        <select asp-for="TipoServicio" class="custom-select">
-                            <option value="1">Venta</option>
-                            <option value="2">Préstamo</option>
+                        <select asp-for="TipoServicio"
+                                id="TipoServicio"
+                                class="custom-select">
+                            @if ((await AuthorizationService.AuthorizeAsync(User, "AdminOrEmpleado")).Succeeded)
+                            {
+                                <option value="1">Venta</option>
+                                <option value="2">Préstamo</option>
+                            }
+                            else
+                            {
+                                <option value="1">Venta</option>
+                            }
+
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="field-label">Origen</label>
+                        <select asp-for="Origen"
+                                class="custom-select">
+                            @if ((await AuthorizationService.AuthorizeAsync(User, "AdminOrEmpleado")).Succeeded)
+                            {
+                                <option value="1">Tienda Física</option>
+                            }
+                            else
+                            {
+                                <option value="2">Web</option>
+                            }
+
                         </select>
                     </div>
 
                     <div class="input-group">
-                        <label class="field-label">Origen</label>
-                        <select asp-for="Origen" class="custom-select">
-                            <option value="1">Tienda Física</option>
-                            <option value="2">Web</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label class="field-label">Tipo de Pago</label>
-                        <select asp-for="TipoPago" class="custom-select">
+                        <label class="field-label">Tipo Pago</label>
+                        <select asp-for="TipoPago"
+                                class="custom-select">
                             <option value="1">Efectivo</option>
                             <option value="2">Tarjeta</option>
                             <option value="3">SINPE</option>
                             <option value="4">Transferencia</option>
                         </select>
                     </div>
-                    <div class="input-group conditional-date" id="grupoFechaDevolucion" style="display:none;">
-                        <label class="field-label">Fecha devolución</label>
-                        <input type="date" class="custom-input" name="FechaDevolucion" id="fechaDevolucion" />
+
+                    <div class="input-group conditional-date"
+                         id="grupoFechaDevolucion"
+                         style="display:none;">
+
+                        <label class="field-label">
+                            Fecha devolución
+                        </label>
+
+                        <input asp-for="FechaDevolucion"
+                               type="date"
+                               class="custom-input" />
+
+                        <span asp-validation-for="FechaDevolucion"
+                              class="error-text"></span>
                     </div>
 
                 </div>
 
                 <div class="separator"></div>
-
                 <div class="inventory-section">
-                    <div class="input-group full-width">
-                        <label class="field-label">Buscar Libro</label>
-                        <input type="text" id="buscarLibro" class="custom-input search-icon"
-                               placeholder="Escriba título o ISBN..." autocomplete="off" />
 
-                        <select id="resultadoLibros" name="Detalles[0].LibroId" class="custom-select result-box">
+                    <div class="input-group full-width">
+                        <label class="field-label">
+                            Buscar Libro
+                        </label>
+
+                        <input type="text"
+                               id="buscarLibro"
+                               class="custom-input search-icon"
+                               placeholder="Título o ISBN..."
+                               autocomplete="off" />
+
+                        <select id="resultadoLibros"
+                                class="custom-select result-box">
                         </select>
                     </div>
 
                     <div class="input-group small">
-                        <label class="field-label">Cantidad</label>
-                        <input name="Detalles[0].Cantidad" class="custom-input" type="number" min="1" value="0" />
-                    </div>
-                </div>
+                        <label class="field-label">
+                            Cantidad
+                        </label>
 
-                <div class="summary-card">
+                        <input id="cantidadLibro"
+                               type="number"
+                               min="1"
+                               value="1"
+                               class="custom-input" />
+                    </div>
+
+                    <div class="input-group small">
+                        <button type="button"
+                                id="btnAgregarLibro"
+                                class="btn-primary-submit">
+                            Agregar Libro
+                        </button>
+                    </div>
+
+                </div>
+                <div class="summary-card" id="previewLibro">
+
                     <div class="summary-item">
                         <span class="label">Precio Unitario:</span>
-                        <span class="value">₡ <span id="precioUnitario">0.00</span></span>
+                        <span class="value">
+                            ₡ <span id="previewPrecio">0.00</span>
+                        </span>
                     </div>
+
                     <div class="summary-item">
                         <span class="label">Disponible:</span>
-                        <span class="value accent" id="stockDisponible">0</span>
+                        <span class="value accent">
+                            <span id="previewStock">0</span>
+                        </span>
                     </div>
+
                     <div class="summary-item total">
                         <span class="label">Subtotal:</span>
-                        <span class="value">₡ <span id="subtotal">0.00</span></span>
+                        <span class="value">
+                            ₡ <span id="previewSubtotal">0.00</span>
+                        </span>
+                    </div>
+
+                </div>
+                <div class="table-responsive">
+                    <table class="table"
+                           id="tablaCarrito">
+
+                        <thead>
+                            <tr>
+                                <th>Libro</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        </tbody>
+
+                    </table>
+                </div>
+                <div id="contenedorDetalles"></div>
+
+                <div class="summary-card">
+                    <div class="summary-item total">
+                        <span class="label">
+                            Total General:
+                        </span>
+                        <span class="value">
+                            ₡ <span id="totalGeneral">0.00</span>
+                        </span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Vuelto:</span>
+                        <span class="value accent">
+                            ₡ <span id="vuelto">0.00</span>
+                        </span>
                     </div>
                 </div>
-
                 <div class="inventory-section">
+
                     <div class="input-group full-width">
-                        <label class="field-label">Monto Pagado</label>
+                        <label class="field-label">
+                            Monto Pagado
+                        </label>
+
                         <input asp-for="MontoPagado"
-                               class="custom-input"
                                type="number"
                                step="0.01"
-                               min="0" />
+                               min="0"
+                               class="custom-input" />
+
+                        <span asp-validation-for="MontoPagado"
+                              class="error-text"></span>
                     </div>
                     <div class="input-group small">
-                        <label class="field-label">Referencia de Pago</label>
+                        <label class="field-label">
+                            Referencia Pago
+                        </label>
+
                         <input asp-for="ReferenciaPago"
                                class="custom-input"
-                               placeholder="Número de comprobante, SINPE, etc." />
+                               placeholder="SINPE, comprobante..." />
                     </div>
+
                 </div>
                 <div class="input-group">
-                    <label class="field-label">Observaciones</label>
+                    <label class="field-label">
+                        Observaciones
+                    </label>
+
                     <textarea asp-for="Observaciones"
-                              class="custom-input"
                               rows="3"
-                              placeholder="Notas adicionales..."></textarea>
+                              class="custom-input"
+                              placeholder="Notas adicionales...">
+                    </textarea>
+                </div>
+                <div class="actions">
+
+                    <button type="submit"
+                            id="btnConfirmar"
+                            class="btn-primary-submit"
+                    disabled>
+                        Confirmar Transacción
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn-back">
+                        Regresar
+                    </a>
+
                 </div>
 
-                <div class="actions">
-                    <button type="submit" class="btn-primary-submit">Confirmar Transacción</button>
-                    <a asp-action="Index" class="btn-back">Regresar al Listado</a>
-                </div>
             </form>
         </div>
     </div>
 </section>
 
 @section Scripts {
-
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+}
 
-    <script>
-        const PRECIO_PRESTAMO = 500;
+<script>
 
-        let debounceTimer;
-        let libroSeleccionado = null;
+    let carrito = [];
+    let indexDetalle = 0;
+    let libroSeleccionado = null;
 
-        const buscarInput = document.getElementById("buscarLibro");
-        const resultadoSelect = document.getElementById("resultadoLibros");
-        const cantidadInput = document.querySelector("input[name='Detalles[0].Cantidad']");
-        const tipoServicioSelect = document.getElementById("TipoServicio");
+    // ELEMENTOS
+    const tipoServicio = document.getElementById("TipoServicio");
+    const tablaBody = document.querySelector("#tablaCarrito tbody");
+    const totalSpan = document.getElementById("totalGeneral");
+    const contenedorDetalles = document.getElementById("contenedorDetalles");
+    const btnAgregar = document.getElementById("btnAgregarLibro");
 
-        const precioSpan = document.getElementById("precioUnitario");
-        const stockSpan = document.getElementById("stockDisponible");
-        const subtotalSpan = document.getElementById("subtotal");
+    const resultadoLibros = document.getElementById("resultadoLibros");
+    const buscarInput = document.getElementById("buscarLibro");
+    const cantidadInput = document.getElementById("cantidadLibro");
 
-        const grupoFecha = document.getElementById("grupoFechaDevolucion");
-        const btnConfirmar = document.querySelector(".btn-primary-submit");
+    const previewPrecio = document.getElementById("previewPrecio");
+    const previewStock = document.getElementById("previewStock");
+    const previewSubtotal = document.getElementById("previewSubtotal");
+    const tipoServicioHidden = document.getElementById("TipoServicioHidden");
+    const montoPagadoInput = document.querySelector("input[name='MontoPagado']");
+    const grupoFecha = document.getElementById("grupoFechaDevolucion");
+    const vueltoSpan = document.getElementById("vuelto");
 
-        const montoPagadoInput = document.querySelector("input[name='MontoPagado']");
+    // PRECIO SEGÚN SERVICIO
+    function obtenerPrecio(libro){
+        if(tipoServicio.value==="2")
+            return parseFloat(libro.dataset.precioprestamo)||0;
+        return parseFloat(libro.dataset.precioventa)||0;
+    }
 
+    // STOCK SEGÚN SERVICIO
+    function obtenerStock(libro){
+        if(tipoServicio.value==="2")
+            return parseInt(libro.dataset.stockprestamo)||0;
+        return parseInt(libro.dataset.stockventa)||0;
+    }
 
-        // =============================
-        // ACTUALIZAR DESDE SELECCIÓN
-        // =============================
-        function actualizarDatosDesdeSeleccion(){
+    // PREVIEW DINÁMICO
+    function actualizarPreview(){
+        if(resultadoLibros.selectedOptions.length===0){
+            limpiarPreview();
+            return;
+        }
+        libroSeleccionado =
+            resultadoLibros.selectedOptions[0];
 
-            if(resultadoSelect.selectedOptions.length === 0) return;
+        const precio = obtenerPrecio(libroSeleccionado);
+        const stockBase = obtenerStock(libroSeleccionado);
+        let cantidad =
+            parseInt(cantidadInput.value)||1;
 
-            libroSeleccionado = resultadoSelect.selectedOptions[0];
-
-            actualizarPrecio();
-            actualizarStock();
-            actualizarSubtotal();
-            validarStockDisponible();
-            validarMontoPagado();
+        if(cantidad>stockBase){
+            cantidad=stockBase;
+            cantidadInput.value=stockBase;
         }
 
+        cantidadInput.max = stockBase;
 
-        // =============================
-        // ACTUALIZAR STOCK
-        // =============================
-        function actualizarStock(){
+        const disponible = Math.max(stockBase-cantidad,0);
+        const subtotal = precio*cantidad;
 
-            if(!libroSeleccionado) return;
+        previewPrecio.innerText = precio.toFixed(2);
+        previewStock.innerText = disponible;
+        previewSubtotal.innerText = subtotal.toFixed(2);
+    }
 
-            let stockBase = 0;
+    // LIMPIAR PREVIEW
+    function limpiarPreview(){
 
-            if(tipoServicioSelect.value === "1")
-                stockBase = parseInt(libroSeleccionado.dataset.stockVenta) || 0;
-            else
-                stockBase = parseInt(libroSeleccionado.dataset.stockPrestamo) || 0;
+        libroSeleccionado=null;
 
-            const cantidad = parseInt(cantidadInput.value) || 0;
+        previewPrecio.innerText="0.00";
+        previewStock.innerText="0";
+        previewSubtotal.innerText="0.00";
+        cantidadInput.value=1;
+        resultadoLibros.selectedIndex=-1;
+        buscarInput.value="";
+    }
 
-            cantidadInput.max = stockBase;
-            cantidadInput.disabled = stockBase <= 0;
+    // LIMPIAR CARRITO
+    function limpiarCarrito(){
 
-            const stockVisual = Math.max(stockBase - cantidad, 0);
+        carrito=[];
+        tablaBody.innerHTML="";
+        contenedorDetalles.innerHTML="";
+        totalSpan.innerText="0.00";
+        indexDetalle=0;
+        limpiarPreview();
+    }
 
-            stockSpan.innerText = stockVisual;
 
-            validarStockDisponible();
+    // RECALCULAR TOTAL GENERAL
+        function recalcularTotal(){
+        let total = 0;
+
+        carrito.forEach(i=>{
+            total += i.subtotal;
+        });
+
+        totalSpan.innerText = total.toFixed(2);
+
+        calcularPago();
+        validarFormulario();
+    }
+
+    // CALCULAR VUELTO
+    function calcularPago(){
+
+        const total = parseFloat(totalSpan.innerText) || 0;
+        const monto = parseFloat(montoPagadoInput.value) || 0;
+        const diferencia = monto - total;
+
+        // ===== PAGO INSUFICIENTE =====
+        if(monto < total){
+
+            vueltoSpan.innerText = "0.00";
+            montoPagadoInput.style.borderColor = "red";
+
+            return false;
         }
 
+        // ===== PAGO CORRECTO =====
+        vueltoSpan.innerText = diferencia.toFixed(2);
+        montoPagadoInput.style.borderColor = "";
 
-        // =============================
-        // OBTENER PRECIO ACTUAL (USA DB)
-        // =============================
-        function obtenerPrecioActual(){
+        return true;
+    }
 
-            if(!libroSeleccionado) return 0;
+    // VALIDAR MONTO
+        montoPagadoInput.addEventListener(
+        "input",
+        () => {
+            calcularPago();
+            validarFormulario();
+        }
+    );
 
-            if(tipoServicioSelect.value === "2"){
-                return parseFloat(libroSeleccionado.dataset.precioPrestamo) || 0;
+    // AGREGAR LIBRO
+    btnAgregar.addEventListener("click", () => {
+
+        if (!libroSeleccionado) {
+            alert("Seleccione un libro");
+            return;
+        }
+
+        const cantidad = parseInt(cantidadInput.value) || 0;
+        const stock = obtenerStock(libroSeleccionado);
+
+        if (cantidad <= 0 || cantidad > stock) {
+            alert("Cantidad inválida");
+            return;
+        }
+
+        const idLibro = libroSeleccionado.value;
+        const existente = carrito.find(i => i.id === idLibro);
+        const precio =  obtenerPrecio(libroSeleccionado);
+
+        if (existente) {
+
+            existente.cantidad += cantidad;
+            existente.subtotal =
+                existente.cantidad * precio;
+
+        } else {
+
+            carrito.push({
+                id: idLibro,
+                nombre: libroSeleccionado.text,
+                cantidad,
+                precio,
+                subtotal: precio * cantidad
+            });
+        }
+
+        renderCarrito();
+        limpiarPreview();
+    });
+
+        function renderCarrito(){
+
+        tablaBody.innerHTML = "";
+        contenedorDetalles.innerHTML = "";
+        indexDetalle = 0;
+
+        carrito.forEach(item => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${item.nombre}</td>
+                <td>${item.cantidad}</td>
+                <td>${item.precio.toFixed(2)}</td>
+                <td>${item.subtotal.toFixed(2)}</td>
+                <td>
+                    <button type="button"
+                        onclick="eliminarItem(${indexDetalle})">
+                        X
+                    </button>
+                </td>
+            `;
+
+            tablaBody.appendChild(row);
+
+            contenedorDetalles.innerHTML += `
+                <input type="hidden"
+                    name="Detalles[${indexDetalle}].LibroId"
+                    value="${item.id}" />
+
+                <input type="hidden"
+                    name="Detalles[${indexDetalle}].Cantidad"
+                    value="${item.cantidad}" />
+            `;
+
+            indexDetalle++;
+        });
+
+        recalcularTotal();
+    }
+
+    // ELIMINAR ITEM
+      function eliminarItem(index){
+        carrito.splice(index,1);
+        renderCarrito();
+    }
+
+    // CAMBIO SERVICIO
+       let servicioAnterior = tipoServicio.value;
+
+    tipoServicio.addEventListener("change", () => {
+
+        if (carrito.length > 0) {
+
+            if (!confirm(
+                "Cambiar servicio limpiará el carrito")) {
+
+                tipoServicio.value = servicioAnterior;
+                return;
             }
 
-            return parseFloat(libroSeleccionado.dataset.precioVenta) || 0;
+            limpiarCarrito();
         }
 
+        servicioAnterior = tipoServicio.value;
 
-        // =============================
-        // ACTUALIZAR PRECIO
-        // =============================
-        function actualizarPrecio(){
+        grupoFecha.style.display =
+            tipoServicio.value === "2"
+                ? "block"
+                : "none";
+    });
 
-            const precio = obtenerPrecioActual();
+    // CAMBIO LIBRO
+    resultadoLibros
+    .addEventListener("change",
+        actualizarPreview);
 
-            precioSpan.innerText = precio.toFixed(2);
-        }
+    cantidadInput
+    .addEventListener("input",
+        actualizarPreview);
 
+    // BUSCAR LIBROS
+    let debounce;
 
-        // =============================
-        // ACTUALIZAR SUBTOTAL
-        // =============================
-        function actualizarSubtotal(){
+    buscarInput.addEventListener("input",function(){
 
-            if(!validarStockDisponible()) return;
+        clearTimeout(debounce);
 
-            if(!libroSeleccionado) return;
+        const term=this.value;
 
-            const precio = obtenerPrecioActual();
+        debounce=setTimeout(()=>{
 
-            const cantidad = parseInt(cantidadInput.value) || 0;
+            if(term.length<2)return;
 
-            const subtotal = precio * cantidad;
+            fetch(`/TransaccionBiblioteca/BuscarLibros?term=${term}`)
+            .then(r=>r.json())
+            .then(data=>{
 
-            subtotalSpan.innerText = subtotal.toFixed(2);
+                resultadoLibros.innerHTML="";
 
-            validarMontoPagado();
-        }
+                data.forEach(libro=>{
 
+                    const op=
+                        document.createElement("option");
 
-        // =============================
-        // VALIDAR STOCK
-        // =============================
-        function validarStockDisponible(){
+                    op.value=libro.id;
+                    op.text=libro.text;
 
-            if(!libroSeleccionado){
+                    op.dataset.precioventa=
+                        libro.precio;
 
-                btnConfirmar.disabled = true;
-                return false;
-            }
+                    op.dataset.precioprestamo=
+                        libro.precioPrestamo;
 
-            let stockBase = 0;
+                    op.dataset.stockventa=
+                        libro.stockVenta;
 
-            if(tipoServicioSelect.value === "1")
-                stockBase = parseInt(libroSeleccionado.dataset.stockVenta) || 0;
-            else
-                stockBase = parseInt(libroSeleccionado.dataset.stockPrestamo) || 0;
+                    op.dataset.stockprestamo=
+                        libro.stockPrestamo;
 
-            const cantidad = parseInt(cantidadInput.value) || 0;
-
-            if(stockBase <= 0){
-
-                stockSpan.innerText = "0";
-                stockSpan.style.color = "#ff4d4d";
-
-                btnConfirmar.disabled = true;
-
-                return false;
-            }
-
-            if(cantidad > stockBase){
-
-                cantidadInput.value = stockBase;
-
-                stockSpan.innerText = "0";
-                stockSpan.style.color = "#ff4d4d";
-
-                btnConfirmar.disabled = true;
-
-                return false;
-            }
-
-            stockSpan.style.color = "";
-
-            btnConfirmar.disabled = false;
-
-            return true;
-        }
-
-
-        // =============================
-        // VALIDAR MONTO PAGADO
-        // =============================
-        function validarMontoPagado(){
-
-            const subtotal = parseFloat(subtotalSpan.innerText) || 0;
-
-            const montoPagado = parseFloat(montoPagadoInput.value) || 0;
-
-            if(montoPagado > subtotal){
-
-                montoPagadoInput.style.borderColor = "#ff4d4d";
-
-                btnConfirmar.disabled = true;
-
-                return false;
-            }
-
-            montoPagadoInput.style.borderColor = "";
-
-            return true;
-        }
-
-
-        // =============================
-        // BUSCAR LIBROS
-        // =============================
-        buscarInput.addEventListener("input", function(){
-
-            clearTimeout(debounceTimer);
-
-            const term = this.value;
-
-            debounceTimer = setTimeout(() => {
-
-                if(term.length < 2) return;
-
-                fetch(`/TransaccionBiblioteca/BuscarLibros?term=${term}`)
-                .then(r => r.json())
-                .then(data => {
-
-                    resultadoSelect.innerHTML = "";
-
-                    if(data.length > 0){
-
-                        data.forEach(libro => {
-
-                            const option = document.createElement("option");
-
-                            option.value = libro.id;
-                            option.text = libro.text;
-
-                            option.dataset.precioVenta = libro.precio;
-                            option.dataset.precioPrestamo = libro.precioPrestamo;
-
-                            option.dataset.stockVenta = libro.stockVenta;
-                            option.dataset.stockPrestamo = libro.stockPrestamo;
-
-                            resultadoSelect.appendChild(option);
-                        });
-
-                        resultadoSelect.selectedIndex = 0;
-
-                        actualizarDatosDesdeSeleccion();
-                    }
+                    resultadoLibros.appendChild(op);
                 });
 
-            }, 300);
+                if(resultadoLibros.options.length>0){
+                    resultadoLibros.selectedIndex=0;
+                    actualizarPreview();
+                }
 
-        });
+            });
 
-
-        // =============================
-        // EVENT LISTENERS
-        // =============================
-        resultadoSelect.addEventListener("change", actualizarDatosDesdeSeleccion);
-
-        cantidadInput.addEventListener("input", function(){
-
-            actualizarStock();
-            actualizarSubtotal();
-        });
-
-        tipoServicioSelect.addEventListener("change", function(){
-
-            const tipo = this.value;
-
-            grupoFecha.style.display = (tipo === "2") ? "block" : "none";
-
-            actualizarPrecio();
-            actualizarStock();
-            actualizarSubtotal();
-        });
-
-        montoPagadoInput.addEventListener("input", validarMontoPagado);
+        },300);
+    });
 
 
-        // =============================
-        // VALIDAR FORM
-        // =============================
-        document.querySelector("form").addEventListener("submit", function(e){
+    // VALIDACIÓN FINAL
+    const btnConfirmar =
+        document.getElementById("btnConfirmar");
 
-            if(!validarStockDisponible()){
+        btnConfirmar.addEventListener("click", function(e){
 
-                e.preventDefault();
-                alert("No hay stock disponible para este servicio.");
+        if(btnConfirmar.disabled){
+            e.preventDefault();
+        }
 
-                return;
-            }
+    });
 
-            if(!validarMontoPagado()){
+        function validarFormulario() {
 
-                e.preventDefault();
-                alert("El monto pagado no puede ser mayor que el subtotal.");
+        const total =
+            parseFloat(totalSpan.innerText) || 0;
 
-                return;
-            }
+        const monto =
+            parseFloat(montoPagadoInput.value) || 0;
 
-        });
-    </script>
+        let valido = true;
+        if (carrito.length === 0) {
+            valido = false;
+        }
+        if (monto < total || total === 0) {
+            valido = false;
+            montoPagadoInput.classList.add("input-error");
+        } else {
+            montoPagadoInput.classList.remove("input-error");
+        }
+        btnConfirmar.disabled = !valido;
+
+    }
+
+</script>
 }

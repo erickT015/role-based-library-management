@@ -124,6 +124,10 @@ namespace AppCrudCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ImagenUrl")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<decimal>("PrecioPrestamo")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");

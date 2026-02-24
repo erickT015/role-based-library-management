@@ -1,6 +1,8 @@
 using AppCrudCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using AppCrudCore.Models.Interfaces;
+using AppCrudCore.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +18,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login"; //sino esta logeado , lo redirige a esta ruta
-        options.AccessDeniedPath = "/Account/AccessDenied"; //esta logueado pero no tiene permisos, lo redirige a esta ruta
+        options.AccessDeniedPath = "/Home/Denegado"; //esta logueado pero no tiene permisos, lo redirige a esta ruta
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
         options.SlidingExpiration = true; //si esta activo, extiende la expiración cada vez que el usuario interactúa con la aplicación
         options.Cookie.HttpOnly = true;
@@ -35,6 +37,10 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Cliente"));
 });
 
+builder.Services.AddScoped<
+    ILibroImageService,
+    LibroImageService>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -51,7 +57,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Libro}/{action=Index}/{id?}")
+    pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.Run();

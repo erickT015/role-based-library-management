@@ -1,7 +1,7 @@
 ﻿@model AppCrudCore.Models.ViewModels.Usuario.UsuarioEditViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Usuario";
 }
 
 <section class="main-container">
@@ -12,70 +12,134 @@
         </header>
         <div class="form-wrapper">
             <form asp-action="Edit">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                 <input type="hidden" asp-for="IdUsuario" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="validation-text"></div>
+                <h3 class="subtitle text-center">Información Personal</h3>
+
                 <div class="form-grid">
+
                     <div class="input-group">
-                        <label class="field-label"> Nombre completo</label>
+                        <label class="field-label">Nombre completo</label>
                         <input asp-for="NombreCompleto" class="custom-input" />
-                        <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+                        <span asp-validation-for="NombreCompleto"
+                              class="validation-text"></span>
                     </div>
+
+                    <div class="input-group">
+                        <label class="field-label">Cédula</label>
+                        <input asp-for="Cedula" class="custom-input" />
+                        <span asp-validation-for="Cedula"
+                              class="validation-text"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="field-label">Correo</label>
+                        <input asp-for="Correo" class="custom-input" />
+                        <span asp-validation-for="Correo"
+                              class="validation-text"></span>
+                    </div>
+
                     <div class="input-group">
                         <label class="field-label">Teléfono</label>
                         <input asp-for="Telefono" class="custom-input" />
-                        <span asp-validation-for="Telefono" class="text-danger"></span>
                     </div>
-                    <div class="input-group">
-                        <label class="field-label"> Cédula</label>
-                        <input asp-for="Cedula" class="custom-input" />
-                        <span asp-validation-for="Cedula" class="text-danger"></span>
-                    </div>
-                    <div class="input-group">
-                        <label  class="field-label">Correo</label>
-                        <input asp-for="Correo" class="custom-input" />
-                        <span asp-validation-for="Correo" class="text-danger"></span>
-                    </div>
-                    <div class="input-group">
-                        <label class="field-label"> Dirección</label>
+
+                    <div class="input-group full-width">
+                        <label class="field-label">Dirección</label>
                         <input asp-for="Direccion" class="custom-input" />
-                        <span asp-validation-for="Direccion" class="text-danger"></span>
                     </div>
+
                     <div class="input-group">
-                        <label class="field-label">Rol</label>
-                        <select asp-for="RolId" class="custom-input" asp-items="ViewBag.RolId"></select>
-                        <span asp-validation-for="RolId" class="text-danger"></span>
+                        <label class="field-label">Rol del sistema</label>
+                        <select asp-for="RolId"
+                                class="custom-select"
+                                asp-items="ViewBag.RolId">
+                        </select>
                     </div>
+
+                </div>
+
+                <div class="separator"></div>
+                <h3 class="subtitle text-center">Seguridad</h3>
+
+                <div class="form-grid">
 
                     <div class="input-group">
                         <label class="field-label">Nueva contraseña</label>
-                        <input asp-for="NuevaPassword" class="custom-input" type="password" id="NuevaPassword" />
-                        <button class="toggle-input" type="button" onclick="togglePassword('NuevaPassword', this)"><i class="bi bi-eye"></i></button>
-                        <span asp-validation-for="NuevaPassword" class="text-danger"></span>
-                    </div>
-                    <div class="input-group">
-                        <label class="field-label">Confirmar contraseña</label>
-                        <input asp-for="ConfirmarPassword" class="custom-input" type="password" id="ConfirmarPassword" />
-                        <button class="toggle-input" type="button" onclick="togglePassword('ConfirmarPassword', this)"><i class="bi bi-eye"></i></button>
-                        <span asp-validation-for="ConfirmarPassword" class="text-danger"></span>
+
+                        <div class="input-container">
+                            <input asp-for="NuevaPassword"
+                                   id="NuevaPassword"
+                                   type="password"
+                                   class="custom-input" />
+
+                            <button type="button"
+                                    class="toggle-input"
+                                    onclick="togglePassword('NuevaPassword',this)">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+
+                        <span asp-validation-for="NuevaPassword"
+                              class="validation-text"></span>
                     </div>
 
-                    <div class="form-group form-check">
-                        <label class="form-check-label">
-                            <input class="form-check-input" asp-for="RequiereCambioPassword" />   Contraseña temporal</label>
+                    <div class="input-group">
+                        <label class="field-label">Confirmar contraseña</label>
+
+                        <div class="input-container">
+                            <input asp-for="ConfirmarPassword"
+                                   id="ConfirmarPassword"
+                                   type="password"
+                                   class="custom-input" />
+
+                            <button type="button"
+                                    class="toggle-input"
+                                    onclick="togglePassword('ConfirmarPassword',this)">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+
+                        <span asp-validation-for="ConfirmarPassword"
+                              class="validation-text"></span>
                     </div>
-                    <div class="form-group form-check">
-                        <label class="form-check-label">
-                            <input class="custom-select" asp-for="Activo" />   Activo
-                        </label>
-                    </div>
+
                 </div>
+
                 <div class="separator"></div>
-                <div class="actions">
-                    <input type="submit" value="Save" class="btn btn-primary" />
-                    <div>
-                        <a asp-action="Index">Back to List</a>
-                    </div>
+                <h3 class="subtitle text-center">Estado del Usuario</h3>
+
+                <div class="summary-card">
+
+                    <label class="d-flex align-items-center gap-2">
+                        <input asp-for="Activo" class="form-check-input" />
+                        <span>Usuario Activo</span>
+                    </label>
+
+                    <label class="d-flex align-items-center gap-2">
+                        <input asp-for="RequiereCambioPassword"
+                               class="form-check-input" />
+                        <span>Forzar cambio de contraseña</span>
+                    </label>
+
                 </div>
+                <div class="actions">
+
+                    <button type="submit"
+                            class="btn-primary-submit">
+                        💾 Guardar Cambios
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn-back">
+                        ← Volver
+                    </a>
+
+                </div>
+
             </form>
         </div>
     </div>

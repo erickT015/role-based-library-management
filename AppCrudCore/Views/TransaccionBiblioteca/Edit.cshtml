@@ -1,51 +1,127 @@
 ﻿@model AppCrudCore.Models.ViewModels.TransaccionBiblioteca.TransaccionBibliotecaEditViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Operación";
 }
 
-<h1>Edit</h1>
+<section class="main-container">
 
-<h4>TransaccionBiblioteca</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+    <div class="glass-card">
+
+        <!-- HEADER -->
+        <div class="form-header">
+            <h1 class="title">Editar Operación</h1>
+            <p class="subtitle">
+                Actualice únicamente la información administrativa permitida
+            </p>
+        </div>
+
         <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdTransaccionBiblioteca" />
-            <div class="input-group">
-                <label>Estado</label>
+
+            <input type="hidden"
+                   asp-for="IdTransaccionBiblioteca" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="error-text">
+            </div>
+            <div class="form-grid">
+
+                <!-- ESTADO -->
                 <div class="input-group">
-                    <label class="field-label">Estado</label>
-                    <select asp-for="Estado" class="custom-select">
-                        <option value="1">Bodega</option>
+                    <label class="field-label">
+                        Estado de la Operación
+                    </label>
+
+                    <select asp-for="Estado"
+                            class="custom-select">
+
+                        <option value="">Seleccione estado</option>
+                        <option value="1">Devuelto</option>
                         <option value="2">Prestado</option>
                         <option value="3">Vendido</option>
                         <option value="4">Cancelado</option>
+
                     </select>
+
+                    <span asp-validation-for="Estado"
+                          class="error-text"></span>
                 </div>
+
+                <!-- FECHA -->
+                <div class="input-group">
+                    <label class="field-label">
+                        Fecha de Devolución
+                    </label>
+
+                    <input asp-for="FechaDevolucion"
+                           type="date"
+                           class="custom-input" />
+
+                    <span asp-validation-for="FechaDevolucion"
+                          class="error-text"></span>
+                </div>
+
             </div>
 
+            <!-- OBSERVACIONES -->
             <div class="input-group">
-                <label>Fecha Devolución</label>
-                <input asp-for="FechaDevolucion" type="date" class="custom-input" />
+                <label class="field-label">
+                    Observaciones
+                </label>
+
+                <textarea asp-for="Observaciones"
+                          rows="4"
+                          placeholder="Notas administrativas..."
+                          class="custom-input"></textarea>
+
+                <span asp-validation-for="Observaciones"
+                      class="error-text"></span>
             </div>
 
-            <div class="input-group">
-                <label>Observaciones</label>
-                <textarea asp-for="Observaciones" class="custom-input"></textarea>
+            <div class="separator"></div>
+
+            <!-- INFO BLOQUE SEGURIDAD -->
+            <div class="summary-card">
+
+                <div class="summary-item">
+                    <span class="label">Modo Seguro</span>
+                    <span class="value">
+                        Solo campos autorizados
+                    </span>
+                </div>
+
+                <div class="summary-item">
+                    <span class="label">ID Operación</span>
+                    <span class="value">
+                        #@Model.IdTransaccionBiblioteca
+                    </span>
+                </div>
+
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <!-- ACTIONS -->
+            <div class="actions">
+
+                <button type="submit"
+                        class="btn-primary-submit">
+                    Guardar Cambios
+                </button>
+
+                <a asp-action="Index"
+                   class="btn-back">
+                    ← Volver al listado
+                </a>
+
             </div>
+
         </form>
-    </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    </div>
+
+</section>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
