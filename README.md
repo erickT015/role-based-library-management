@@ -1,259 +1,448 @@
-Library Management System — ASP.NET Core MVC
+\# Library Management System — ASP.NET Core MVC
 
-Sistema web de gestión de biblioteca desarrollado con ASP.NET Core MVC, enfocado en la implementación de arquitectura backend profesional, control de acceso seguro y procesamiento transaccional con manejo de inventario.
 
-El objetivo principal del proyecto fue construir una aplicación aplicando prácticas reales utilizadas en entornos empresariales, priorizando la seguridad, consistencia de datos y separación clara de responsabilidades.
 
-## Objetivo del Proyecto
+Sistema web de gestión de biblioteca desarrollado con \*\*ASP.NET Core MVC\*\*, enfocado en arquitectura backend, control de acceso seguro y procesamiento transaccional con manejo de inventario.
 
-Diseñar un sistema multi-rol capaz de administrar usuarios, catálogo e historial de operaciones mediante reglas de negocio aplicadas completamente desde backend.
 
-El sistema fue desarrollado poniendo énfasis en:
 
-Arquitectura mantenible
+El proyecto está pensado para la gestión diaria de una biblioteca asumiendo empleados físicos en tienda, permisos de solo administrador, autogestión de clientes, partiendo de un crud básico se escaló usando enfoque empresarial especialmente en autenticación, autorización y manejo interno de operaciones.
 
-Control de acceso por rol
 
-Integridad transaccional
 
-Modelado relacional real
-
-Seguridad a nivel aplicación
-
-
-# Arquitectura Implementada
-
-La aplicación sigue una arquitectura basada en ASP.NET Core MVC con separación explícita entre capas:
-
-Domain Models
-
-DTO Pattern (ViewModels)
-
-Controller Application Layer
-
-Service Layer Abstraction
-
-Data Access Layer (EF Core)
-
-El uso de DTO Pattern permite aislar entidades de persistencia evitando exposición directa del modelo de base de datos hacia la capa de presentación.
-
-Conceptos aplicados:
-
-Layered Architecture
-
-Separation of Concerns
-
-Dependency Injection
-
-Service-Oriented Design
-
-
-# Autenticación e Identidad
-
-Se implementó un sistema de autenticación personalizado sin utilizar scaffolding automático.
-
-Características principales:
-
-Cookie-Based Authentication
-
-Claims-Based Identity
-
-Custom Authentication Workflow
-
-Authentication Ticket Management
-
-Session Persistence Control
-
-La identidad del usuario autenticado se mantiene mediante Claims, permitiendo que el backend tome decisiones de autorización sin depender de estado en frontend.
-
-
-# Autorización y Control de Acceso
-
-El acceso a funcionalidades y datos se controla completamente desde backend mediante:
-
-Policy-Based Authorization
-
-Role-Based Access Control (RBAC)
-
-Application-Level Row Security
-
-Ownership Validation
-
-Privilege Escalation Prevention
-
-Cada consulta es filtrada dinámicamente dependiendo del rol autenticado, garantizando aislamiento de información entre usuarios.
-
-
-# Gestión de Usuarios
-
-Se desarrolló un módulo completo de administración de usuarios incluyendo:
-
-Registro autónomo de clientes
-
-Administración por roles
-
-Edición controlada de perfiles
-
-Protección de campos sensibles
-
-Desactivación lógica de cuentas
-
-Conceptos implementados:
-
-Secure User Management
-
-DTO-Based Input Control
-
-Overposting Protection
-
-Soft Delete Pattern
-
-Self-Service Profile Management
-
-Las credenciales se almacenan mediante:
-
-BCrypt Password Hashing
-
-
-# Sistema Transaccional e Inventario
-
-El núcleo del sistema consiste en un motor transaccional capaz de procesar múltiples libros dentro de una misma operación.
-
-Capacidades implementadas:
-
-Multi-Item Transaction Processing
-
-Atomic Database Transactions
-
-ACID Consistency Enforcement
-
-Inventory Consistency Control
-
-Real-Time Stock Validation
-
-Backend Financial Validation
-
-Transaction Number Generation
-
-Las reglas del negocio se aplican exclusivamente en backend mediante Business Rule Enforcement.
-
-# Gestión de Catálogo
-
-El módulo administrativo permite la gestión completa del inventario:
-
-Administración de libros y categorías
-
-Control separado de stock (venta / préstamo)
-
-Filtrado dinámico
-
-Conservación histórica de registros
-
-Conceptos aplicados:
-
-Inventory Management Module
-
-Query Composition Pattern
-
-Relational Data Loading
-
-Soft Delete Strategy
-
-
-# Procesamiento de Imágenes
-
-Se implementó una capa de servicios dedicada al manejo de imágenes de libros.
-
-Funcionalidades:
-
-Redimensionamiento automático
-
-Compresión WebP
-
-Generación de nombres únicos
-
-Reemplazo seguro de recursos
-
-Conceptos aplicados:
-
-Service Layer Abstraction
-
-File Storage Decoupling
-
-Image Optimization Pipeline
-
-Resource Lifecycle Management
-
-# Modelado de Datos
-
-El sistema fue construido utilizando Entity Framework Core (Code First) aplicando:
-
-Relaciones múltiples entre entidades
-
-Aggregate Transaction Modeling
-
-Enum-Based Domain Modeling
-
-Query-Level Filtering
-
-Permitiendo trazabilidad completa de operaciones dentro del sistema.
-
-
-# Tecnologías Utilizadas
-Backend
-
-ASP.NET Core MVC
-
-Entity Framework Core
-
-LINQ
-
-SQL Server
-
-Arquitectura
-
-MVC Pattern
-
-DTO Pattern
-
-Service Layer
-
-Transaction Management
-
-Seguridad
-
-Cookie Authentication
-
-Claims-Based Identity
-
-Role-Based Authorization
-
-BCrypt Password Hashing
-
-Frontend
-
-Razor Views
-
-Bootstrap
-
-
-# Enfoque Técnico del Proyecto
-
-Este proyecto demuestra experiencia práctica en:
-
-Secure Backend Architecture
-
-Identity & Access Management
-
-Transactional System Design
-
-Inventory Synchronization
-
-Role-Driven Workflows
-
-Enterprise MVC Application Structure
 ---
 
-## Objetivo técnico del proyecto
 
-Aplicar prácticas reales de desarrollo backend utilizando el ecosistema .NET, incluyendo modelado relacional, gestión segura de credenciales y arquitectura MVC profesional a partir de un crud base.
+
+\##  ¿Qué problema resuelve?
+
+
+
+✔ Gestión multi-rol con acceso controlado a la información  
+
+✔ Control de inventario separado para venta y préstamo  
+
+✔ Procesamiento transaccional consistente entre múltiples libros  
+
+✔ Validaciones financieras ejecutadas en servidor  
+
+✔ Prevención de inconsistencias al trasladar validaciones críticas desde frontend hacia backend
+
+---
+
+
+
+\##  Enfoque técnico aplicado
+
+
+
+\- Arquitectura MVC en capas
+
+\- DTO Pattern para aislamiento de datos
+
+\- Policy-Based Authorization
+
+\- Claims-Based Authentication
+
+\- Manejo de estados transaccionales
+
+\- Service Layer para reglas de negocio
+
+---
+
+
+
+\##  Decisiones técnicas
+
+
+
+\- Clean Layered Architecture
+
+\- Claims-Based Authentication
+
+\- Policy-Based Authorization
+
+\- ACID Transaction Handling
+
+\- Soft Delete Strategy
+
+\- Service Layer Abstraction
+
+
+
+---
+
+
+
+\##  Architecture Overview
+
+
+
+<details>
+
+<summary>View Architecture Details</summary>
+
+
+
+\### Layered Structure
+
+
+
+\- \*\*Domain Models\*\*
+
+\- \*\*DTO / ViewModels\*\*
+
+\- \*\*Controllers\*\*
+
+\- \*\*Service Layer\*\*
+
+\- \*\*Data Access Layer (EF Core)\*\*
+
+
+
+Concepts applied:
+
+
+
+\- Separation of Concerns  
+
+\- Dependency Injection  
+
+\- Service-Oriented Design  
+
+\- Layered Architecture  
+
+
+
+DTOs prevent persistence model exposure to presentation layer.
+
+
+
+</details>
+
+
+
+---
+
+
+
+\## Authentication \& Authorization
+
+
+
+<details>
+
+<summary>Security Implementation</summary>
+
+
+
+\### Authentication
+
+\- Cookie-Based Authentication
+
+\- Claims-Based Identity
+
+\- Custom Authentication Workflow
+
+\- Session Persistence Control
+
+
+
+\### Authorization
+
+\- Policy-Based Authorization
+
+\- Role-Based Access Control
+
+\- Ownership Validation
+
+\- Privilege Escalation Prevention
+
+\- Application-Level Row Security
+
+
+
+All authorization decisions are enforced in backend.
+
+
+
+</details>
+
+
+
+---
+
+
+
+\##  Transaction \& Inventory Engine
+
+
+
+<details>
+
+<summary>Transaction System Details</summary>
+
+
+
+Core transactional engine capable of processing multiple books per operation.
+
+
+
+Implemented features:
+
+
+
+\- Multi-item transactions
+
+\- Atomic database operations
+
+\- Real-time stock validation
+
+\- Financial backend validation
+
+\- Transaction number generation
+
+\- Inventory synchronization
+
+
+
+Business rules executed exclusively server-side.
+
+
+
+</details>
+
+
+
+---
+
+
+
+\##  User Management
+
+
+
+<details>
+
+<summary>User Module</summary>
+
+
+
+\- Role administration
+
+\- Controlled profile editing
+
+\- Secure registration
+
+\- Soft delete accounts
+
+\- Overposting protection
+
+
+
+Security:
+
+\- BCrypt password hashing
+
+\- DTO-based input validation
+
+
+
+</details>
+
+
+
+---
+
+
+
+\##  Catalog Management
+
+
+
+<details>
+
+<summary>Inventory Module</summary>
+
+
+
+\- Book \& category administration
+
+\- Separate stock handling (sale / loan)
+
+\- Dynamic filtering
+
+\- Historical consistency
+
+
+
+Patterns used:
+
+\- Query Composition
+
+\- Relational Data Loading
+
+\- Soft Delete Strategy
+
+
+
+</details>
+
+
+
+---
+
+
+
+\##  Image Processing Service
+
+
+
+<details>
+
+<summary>Image Pipeline</summary>
+
+
+
+Dedicated service layer for book images:
+
+
+
+\- Automatic resizing
+
+\- WebP compression
+
+\- Unique filename generation
+
+\- Safe resource replacement
+
+
+
+Concepts:
+
+\- File Storage Decoupling
+
+\- Resource Lifecycle Management
+
+\- Image Optimization Pipeline
+
+
+
+</details>
+
+
+
+---
+
+
+
+\##  Data Modeling
+
+
+
+<details>
+
+<summary>Database Design</summary>
+
+
+
+Built using \*\*Entity Framework Core (Code First)\*\*:
+
+
+
+\- Relational entity modeling
+
+\- Enum-based domain logic
+
+\- Aggregate transaction modeling
+
+\- Query-level filtering
+
+
+
+Ensures full transactional traceability.
+
+
+
+</details>
+
+
+
+---
+
+
+
+\##  Tech Stack
+
+
+
+\### Backend
+
+\- ASP.NET Core MVC
+
+\- Entity Framework Core
+
+\- LINQ
+
+\- SQL Server
+
+
+
+\### Architecture
+
+\- MVC Pattern
+
+\- DTO Pattern
+
+\- Service Layer
+
+\- Transaction Management
+
+
+
+\### Security
+
+\- Cookie Authentication
+
+\- Claims Identity
+
+\- Role-Based Access Control (RBAC)
+
+\- Policy-Based Authorization
+
+\- BCrypt Hashing
+
+
+
+\### Frontend
+
+\- Razor Views
+
+\- Bootstrap
+
+
+
+---
+
+
+
+\## Learning Outcomes
+
+
+
+Algunos de los aprendizajes más relevantes surgieron al enfrentar problemas como:
+
+
+
+\- Cómo el model binding procesa automáticamente los datos enviados desde formularios y cómo atributos como `\[BindNever]` afectan directamente lo que el backend espera recibir en un POST.
+
+\- Comprender que los modelos no solo representan datos, sino que también pueden encapsular reglas de negocio y validaciones mediante `IValidatableObject`.
+
+\- La importancia de usar viewModel(DTO) para transefir solo los datos requeridos y esperados por el method.
+
+\- La importancia de mover validaciones críticas desde controladores hacia el dominio para evitar inconsistencias.
+
+\- Manejar correctamente estados transaccionales y sincronización de inventario cuando múltiples operaciones afectan una misma entidad usando el model desde el method.
+
+\- Diferenciar entre hacer que una funcionalidad funcione y diseñarla para que sea segura y consistente según reglas del negocio.
+
