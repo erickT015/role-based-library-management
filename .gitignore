@@ -11,8 +11,8 @@ obj/
 *.log
 
 # Ignore uploaded book images
-wwwroot/images/libros/*
-!wwwroot/images/libros/.gitkeep
+AppCrudCore/wwwroot/images/libros/*
+!AppCrudCore/wwwroot/images/libros/.gitkeep
 
 # App settings locales
 appsettings.json
