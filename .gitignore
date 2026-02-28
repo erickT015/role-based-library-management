@@ -10,7 +10,7 @@ obj/
 # Logs
 *.log
 
-# Ignore uploaded book images
+# Ignorar subida de imagenes
 AppCrudCore/wwwroot/images/libros/*
 !AppCrudCore/wwwroot/images/libros/.gitkeep
 
